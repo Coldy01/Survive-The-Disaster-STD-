@@ -1,0 +1,19 @@
+{
+  "appId": "com.std.survive.app",
+  "appName": "SurviveTheDisaster",
+  "webDir": "www",
+  "bundledWebRuntime": false,
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 0
+    }
+  },
+  "android": {
+    "allowMixedContent": true,
+    "id": "com.std.survive.app",
+    "path": "AppSTD"
+  },
+  "ios": {
+    "allowMixedContent": true
+  }
+}

@@ -1,0 +1,1156 @@
+ <!DOCTYPE html>
+  <html lang="en">
+  <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+      <meta name="description" content="An educational disaster survival game - Final fire challenge" />
+      <meta name="theme-color" content="#00b7ff" />
+      <meta name="apple-mobile-web-app-capable" content="yes" />
+      <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+      <meta name="apple-mobile-web-app-title" content="Survive" />
+      <title>Level 4 - rescued</title>
+      <link rel="stylesheet" href="game.css" />
+      <style>
+          body {
+              margin: 0;
+              padding: 0;
+              background: #030303;
+              font-family: 'Press Start 2P', monospace;
+              overflow: hidden;
+          }
+
+          /* Container for background and game layers */
+          #gameContainer {
+              position: relative;
+              width: 100vw;
+              height: 100vh;
+              margin: 0;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              transform: translateX(-150px);
+          }
+
+          /* Background layer - positioned relative to game area */
+          #backgroundLayer {
+            margin-left: 10%;
+              position: absolute;
+              top: 50%;
+              left: 50%;
+              transform: translate(-50%, -50%);
+              width: 70%;
+              height: 70%;
+              background: url('4e.Ending/sti/4eRoad.png') no-repeat center center;
+              background-size: 100%;
+              background-position: center center;
+              background-repeat: no-repeat;
+              z-index: 1;
+              pointer-events: none;
+          }
+
+          /* Game area - matches background layer dimensions */
+          #gameArea {
+              position: relative;
+              width: 70%;  /* Match background size */
+              height: 70%; /* Match background size */
+              margin: 0 auto; /* Center the game area */
+              left: 45%;
+              transform: translateX(-50%);
+              z-index: 2;
+          }
+
+          #character {
+              position: absolute;
+              width: 140px;
+              height: 140px;
+              background-size: contain;
+              background-repeat: no-repeat;
+              background-position: center;
+              image-rendering: pixelated;
+              z-index: 10;
+              transform-origin: center;
+          }
+
+          .story-text {
+              position: absolute;
+              width: 60%;
+              top: 50%;
+              left: 50%;
+              transform: translate(-50%, -50%);
+              color: white;
+              font-size: 14px;
+              background: rgba(0,0,0,0.9);
+              padding: 20px;
+              border-radius: 10px;
+              text-align: center;
+              max-width: 600px;
+              z-index: 1000;
+              display: none;
+          }
+
+          .objective-indicator {
+              width: 20%;
+              margin-right: 190%;
+              position: absolute;
+              top: 60px;
+              color: #4CAF50;
+              font-size: 12px;
+              background: rgba(0,0,0,0.7);
+              padding: 10px;
+              border-radius: 5px;
+              border: 1px solid #4CAF50;
+          }
+
+          .interactive-rescuer {
+              margin-top: 12%;
+              margin-left: 25%;
+              position: absolute;
+              background: url('4e.Ending/rescue/rescuer.png') no-repeat center;
+              background-size: contain;
+              cursor: pointer;
+              z-index: 6;
+              border: 2px solid transparent;
+              transition: border-color 0.3s ease;
+              opacity: 1;
+          }
+
+          .ground-floor {
+              position: absolute;
+              z-index: 1;
+          }
+
+          .rescuer-interaction-hint {
+              position: absolute;
+              top: 10px;
+              left: 50%;
+              transform: translateX(-50%);
+              color: #FFD700;
+              font-size: 10px;
+              background: rgba(0,0,0,0.8);
+              padding: 5px;
+              border-radius: 3px;
+              white-space: nowrap;
+              z-index: 7;
+              opacity: 1;
+              transition: opacity 0.3s ease;
+              border: 1px solid #FFD700;
+          }
+
+          @keyframes portalPulse {
+              0% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.7); }
+              70% { box-shadow: 0 0 0 15px rgba(255, 215, 0, 0); }
+              100% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0); }
+          }
+
+          .completion-overlay {
+              position: absolute;
+              top: 50%;
+              left: 50%;
+              transform: translate(-50%, -50%);
+              width: 100%;
+              height: 100%;
+              background: rgba(0, 0, 0, 0.8);
+              z-index: 1000;
+              display: none;
+              justify-content: center;
+              align-items: center;
+              flex-direction: column;
+          }
+
+          /* Death Overlay Styles */
+          .death-overlay {
+              position: fixed;
+              top: 0;
+              left: 0;
+              width: 100%;
+              height: 100%;
+              background: rgba(0, 0, 0, 0.95);
+              z-index: 4000;
+              display: none;
+              justify-content: center;
+              align-items: center;
+              flex-direction: column;
+          }
+
+          .death-content {
+              background: linear-gradient(135deg, #8B0000, #3d3c3d);
+              border: 4px solid #FF0000;
+              border-radius: 20px;
+              padding: 40px;
+              text-align: center;
+              box-shadow: 0 20px 60px rgba(139, 0, 0, 0.8);
+              max-width: 600px;
+              min-width: 500px;
+              transform: scale(0.7);
+              transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+          }
+
+          .death-overlay.show .death-content {
+              transform: scale(1);
+          }
+
+          .death-content h2 {
+              color: #FF0000;
+              font-family: 'Press Start 2P';
+              font-size: 24px;
+              margin-bottom: 20px;
+              text-shadow: 2px 2px 0 #000;
+              animation: death-pulse 1s infinite alternate;
+          }
+
+          .death-content p {
+              color: white;
+              font-family: 'Press Start 2P';
+              font-size: 30px;
+              line-height: 1.4;
+              margin-bottom: 15px;
+          }
+
+          .death-buttons {
+              display: flex;
+              gap: 30px;
+              justify-content: center;
+              margin-top: 30px;
+          }
+
+          .try-again-btn {
+              background: linear-gradient(135deg, #4CAF50, #45a049);
+              border: 3px solid #4CAF50;
+              color: white;
+              font-family: 'Press Start 2P';
+              font-size: 12px;
+              padding: 15px 25px;
+              border-radius: 8px;
+              cursor: pointer;
+              transition: all 0.3s ease;
+              text-transform: uppercase;
+          }
+
+          .try-again-btn:hover {
+              background: linear-gradient(135deg, #45a049, #4CAF50);
+              box-shadow: 0 0 20px rgba(76, 175, 80, 0.6);
+              transform: translateY(-2px);
+          }
+
+          @keyframes death-pulse {
+              0% { text-shadow: 2px 2px 0 #000, 0 0 10px #FF0000; }
+              100% { text-shadow: 2px 2px 0 #000, 0 0 20px #FF0000, 0 0 30px #FF0000; }
+          }
+
+          .completion-content {
+              background: rgba(0, 0, 0, 0.9);
+              padding: 40px;
+              border-radius: 20px;
+              text-align: center;
+              color: white;
+              max-width: 800px;
+              max-height: 90vh;
+              overflow-y: auto;
+          }
+
+          .completion-buttons {
+              display: flex;
+              gap: 20px;
+              margin-top: 20px;
+              justify-content: center;
+          }
+
+          .level-button {
+              padding: 12px 24px;
+              font-size: 14px;
+              border: none;
+              border-radius: 8px;
+              cursor: pointer;
+              font-family: 'Press Start 2P', monospace;
+              transition: all 0.3s ease;
+          }
+
+          .next-level-btn {
+              background: #4CAF50;
+              color: white;
+          }
+
+          .next-level-btn:hover {
+              background: #45a049;
+              transform: scale(1.05);
+          }
+
+          .main-menu-btn {
+              background: #2196F3;
+              color: white;
+          }
+
+          .main-menu-btn:hover {
+              background: #1976D2;
+              transform: scaleY(1.05);
+          }
+
+          .achievement-celebration {
+              background: linear-gradient(135deg, rgba(255, 69, 0, 0.1), rgba(0, 183, 255, 0.1));
+              border: 2px solid #FF4500;
+              border-radius: 15px;
+              padding: 20px;
+              margin-bottom: 25px;
+          }
+
+          .achievement-celebration p {
+              font-family: 'Press Start 2P';
+              font-size: 12px;
+              line-height: 1.4;
+              margin: 8px 0;
+          }
+
+          .post-disaster-education {
+              background: linear-gradient(135deg, rgba(255, 69, 0, 0.1), rgba(255, 140, 0, 0.1));
+              border: 2px solid #FF4500;
+              border-radius: 15px;
+              padding: 25px;
+              margin: 20px 0;
+              text-align: left;
+          }
+
+          .post-disaster-education h3 {
+              color: #FF4500;
+              font-family: 'Press Start 2P';
+              font-size: 14px;
+              text-align: center;
+              margin-bottom: 20px;
+              text-shadow: 1px 1px 0 #000;
+          }
+
+          .safety-image-section {
+              display: flex;
+              align-items: flex-start;
+              gap: 20px;
+              margin-bottom: 25px;
+              background: rgba(0, 0, 0, 0.7);
+              padding: 20px;
+              border-radius: 10px;
+              border-left: 4px solid #FF4500;
+          }
+
+          .safety-image {
+              width: 180px;
+              height: 140px;
+              object-fit: contain;
+              border-radius: 8px;
+              box-shadow: 0 5px 15px rgba(255, 69, 0, 0.4);
+              flex-shrink: 0;
+          }
+
+          .safety-description {
+              flex: 1;
+          }
+
+          .safety-description h4 {
+              color: #FF4500;
+              font-family: 'Press Start 2P';
+              font-size: 12px;
+              margin-bottom: 10px;
+              text-shadow: 1px 1px 0 #000;
+          }
+
+          .safety-description p {
+              color: white;
+              font-family: 'Press Start 2P';
+              font-size: 10px;
+              line-height: 1.4;
+              opacity: 0.9;
+              margin: 0;
+          }
+
+          .critical-reminders {
+              background: rgba(139, 0, 0, 0.3);
+              border: 2px solid #FF6B6B;
+              border-radius: 10px;
+              padding: 20px;
+              margin-top: 20px;
+          }
+
+          .critical-reminders h4 {
+              color: #FF6B6B;
+              font-family: 'Press Start 2P';
+              font-size: 12px;
+              text-align: center;
+              margin-bottom: 15px;
+              text-shadow: 1px 1px 0 #000;
+          }
+
+          .reminder-points {
+              display: flex;
+              flex-direction: column;
+              gap: 15px;
+          }
+
+          .reminder-point {
+              background: rgba(0, 0, 0, 0.6);
+              border-left: 4px solid #FFA500;
+              padding: 15px;
+              border-radius: 5px;
+          }
+
+          .reminder-point strong {
+              color: #FFA500;
+              font-family: 'Press Start 2P';
+              font-size: 10px;
+              display: block;
+              margin-bottom: 8px;
+              line-height: 1.3;
+          }
+
+          .reminder-point p {
+              color: white;
+              font-family: 'Press Start 2P';
+              font-size: 9px;
+              line-height: 1.3;
+              margin: 0;
+              opacity: 0.9;
+          }
+
+          .final-message {
+              background: rgba(0, 100, 0, 0.3);
+              border: 2px solid #00FF00;
+              border-radius: 10px;
+              padding: 20px;
+              margin-top: 20px;
+              text-align: center;
+          }
+
+          .final-message h4 {
+              color: #00FF00;
+              font-family: 'Press Start 2P';
+              font-size: 12px;
+              margin-bottom: 10px;
+              text-shadow: 1px 1px 0 #000;
+          }
+
+          .final-message p {
+              color: white;
+              font-family: 'Press Start 2P';
+              font-size: 10px;
+              line-height: 1.4;
+              margin: 0;
+              opacity: 0.9;
+          }
+
+
+          @keyframes walkRight {
+              0% { background-image: url('player/Walk1.png'); }
+              8.33% { background-image: url('player/Walk2.png'); }
+              16.66% { background-image: url('player/Walk3.png'); }
+              25% { background-image: url('player/Walk4.png'); }
+              33.33% { background-image: url('player/Walk5.png'); }
+              41.66% { background-image: url('player/Walk6.png'); }
+              50% { background-image: url('player/Walk7.png'); }
+              58.33% { background-image: url('player/Walk8.png'); }
+              66.66% { background-image: url('player/Walk9.png'); }
+              75% { background-image: url('player/Walk10.png'); }
+              83.33% { background-image: url('player/Walk11.png'); }
+              91.66% { background-image: url('player/Walk12.png'); }
+              100% { background-image: url('player/Walk1.png'); }
+          }
+
+          @keyframes walkLeft {
+              0% { background-image: url('player/Walk1.png'); transform: scaleX(-1); }
+              8.33% { background-image: url('player/Walk2.png'); transform: scaleX(-1); }
+              16.66% { background-image: url('player/Walk3.png'); transform: scaleX(-1); }
+              25% { background-image: url('player/Walk4.png'); transform: scaleX(-1); }
+              33.33% { background-image: url('player/Walk5.png'); transform: scaleX(-1); }
+              41.66% { background-image: url('player/Walk6.png'); transform: scaleX(-1); }
+              50% { background-image: url('player/Walk7.png'); transform: scaleX(-1); }
+              58.33% { background-image: url('player/Walk8.png'); transform: scaleX(-1); }
+              66.66% { background-image: url('player/Walk9.png'); transform: scaleX(-1); }
+              75% { background-image: url('player/Walk10.png'); transform: scaleX(-1); }
+              83.33% { background-image: url('player/Walk11.png'); transform: scaleX(-1); }
+              91.66% { background-image: url('player/Walk12.png'); transform: scaleX(-1); }
+              100% { background-image: url('player/Walk1.png'); transform: scaleX(-1); }
+          }
+
+          .walk-animation {
+              animation: walkRight 0.8s steps(12) infinite;
+          }
+
+          .walk-left {
+              animation: walkLeft 0.8s steps(12) infinite;
+          }
+
+          .character-idle {
+              background-image: url('player/Idle.png');
+              transform: scaleX(1);
+          }
+      </style>
+  </head>
+ <body>
+     <div id="gameContainer">
+         <div id="backgroundLayer"></div>
+         <div id="gameArea">
+         <div id="character"></div>
+
+
+         <!-- Ground Floor -->
+         <div class="ground-floor" style= "left: 0; top: 80%; width: 100%; height: 100px; background: transparent;"></div>
+
+         <!-- Interactive Rescuer -->
+         <div class="interactive-rescuer" id="interactiveRescuer" style="left: 200px; top: 50px; width: 200px; height: 200px;">
+             <div class="rescuer-interaction-hint" id="rescuerHint">Press E to call rescuer</div>
+         </div>
+
+         <!-- Story Text Overlay -->
+         <div class="story-text" id="storyText">
+             <h3>THE RECUERS ARRIVED</h3>
+             <p>As the flames die down, the rescuers rush in through the smoke, ready to help.</p>
+             <p>Go to the rescuers and listen to their instruction.</p>
+             <button class="level-button" onclick="startLevel()">Okay!</button>
+         </div>
+
+         <!-- Level Completion Overlay -->
+         <div class="completion-overlay" id="completionOverlay">
+             <div class="completion-content">
+                 <h2>🏆 FIRE SAFETY MASTER! 🏆</h2>
+                 
+                 <!-- Achievement Celebration -->
+                 <div class="achievement-celebration">
+                     <p><strong>🎉 CONGRATULATIONS! 🎉</strong></p>
+                     <p>You've successfully completed all Fire levels!</p>
+                     <p>You've proven your fire safety skills in the STI Building disaster scenario.</p>
+                     <p><span style="color: #00ff00;">You are now a certified Fire Safety Expert!</span></p>
+                 </div>
+                 
+                 <!-- Post-Fire Safety Education -->
+                 <div class="post-disaster-education">
+                     <h3>🔥 POST-FIRE SAFETY PROTOCOLS 🔥</h3>
+                     
+                     <!-- Fire Assembly Point Image -->
+                     <div class="safety-image-section">
+                         <img src="4eAssembly.png" alt="Fire Assembly Point" class="safety-image">
+                         <div class="safety-description">
+                             <h4>🏢 FIRE ASSEMBLY POINTS</h4>
+                             <p>After a fire, always proceed to designated assembly points. These fire-safe zones provide adequate distance from damaged buildings and allow emergency responders to account for all evacuees.</p>
+                         </div>
+                     </div>
+                     
+                     <!-- Safe Distance Image -->
+                     <div class="safety-image-section">
+                         <img src="4eKeepDistance.png" alt="Maintaining Safe Distance from Fire" class="safety-image">
+                         <div class="safety-description">
+                             <h4>📏 SAFE DISTANCE FROM FIRE DAMAGE</h4>
+                             <p>Maintain a safe distance of at least 100 feet from fire-damaged buildings. Hot surfaces, toxic gases, and structural instability make close proximity extremely dangerous.</p>
+                         </div>
+                     </div>
+                     
+                     <!-- Critical Fire Safety Reminders -->
+                     <div class="critical-reminders">
+                         <h4>⚠️ CRITICAL FIRE SAFETY REMINDERS ⚠️</h4>
+                         <div class="reminder-points">
+                             <div class="reminder-point">
+                                 <strong>🚫 NEVER RE-ENTER FIRE-DAMAGED BUILDINGS:</strong>
+                                 <p>Structural integrity is compromised. Carbon monoxide, smoke, and hidden flames may still pose deadly threats. Wait for professional fire department clearance.</p>
+                             </div>
+                             <div class="reminder-point">
+                                 <strong>👁️ WATCH FOR HAZARDOUS MATERIALS:</strong>
+                                 <p>Fire can release toxic chemicals, asbestos, and other hazardous materials. Avoid contact with water run-off from fire scenes.</p>
+                             </div>
+                             <div class="reminder-point">
+                                 <strong>🎯 FOLLOW EMERGENCY CREW INSTRUCTIONS:</strong>
+                                 <p>Fire officials will direct you to appropriate areas. Never return to buildings until officially cleared by fire department or building inspectors.</p>
+                             </div>
+                             <div class="reminder-point">
+                                 <strong>📱 ACCOUNT FOR EVERYONE:</strong>
+                                 <p>Do a headcount at assembly points. Report any missing persons to emergency responders immediately.</p>
+                             </div>
+                         </div>
+                     </div>
+                     
+                     <!-- Final Fire Safety Message -->
+                     <div class="final-message">
+                         <h4>🌟 REMEMBER: FIRE SAFETY SAVES LIVES 🌟</h4>
+                         <p>Your quick thinking and proper fire safety knowledge can mean the difference between life and death. Practice these skills regularly and share your knowledge with others!</p>
+                     </div>
+                 </div>
+                 
+                 <div class="completion-buttons">
+                     <button class="level-button main-menu-btn" onclick="mainMenu()">Main Menu</button>
+                 </div>
+             </div>
+         </div>
+
+         <!-- Death/Failure Overlay -->
+         <div class="death-overlay" id="deathOverlay" style="display: none;">
+             <div class="death-content">
+                 <h2> Mission Failed! </h2>
+                 <p style="font-size: 16px; color: #ffffff; margin: 20px 0;">You didn't reached the rescuers!</p>
+                 <p style="font-size: 12px; opacity: 0.8;">You must navigate carefully and approach the rescuers!</p>
+                 <div class="death-buttons">
+                     <button class="level-button try-again-btn" onclick="tryAgain()">Try Again</button>
+                     <button class="level-button main-menu-btn" onclick="deathMainMenu()">Main Menu</button>
+                 </div>
+             </div>
+         </div>
+
+         </div>
+     </div>
+
+     <script>
+         // Game variables
+         const player = {
+             x: 20,
+             y: 50,
+             width: 60,
+             height: 60,
+             velX: 0,
+             velY: 0,
+             onGround: true,
+             speed: 3,
+             jumpPower: -10,
+             gravity: 0.4,
+             friction: 0.8
+         };
+
+         const gameArea = document.getElementById('gameArea');
+         const character = document.getElementById('character');
+         let gameLoopId = null;
+         let keys = {};
+         let earthquakeIntensity = 4;
+         let aftershockTimer = 0;
+         let lastDirection = 'right';
+         let interactionTimer = null;
+         let hasInteracted = false;
+         let isScreenShaking = false;
+         let shakeIntensity = 3;
+
+         // Initialize character position and idle state
+         const gameAreaWidth = gameArea.offsetWidth;
+         const gameAreaHeight = gameArea.offsetHeight;
+         player.x = 20; // Start from left side horizontally
+
+         // Position character to touch the ground platform
+         // Ground platform is at top: 80%, so calculate its pixel position
+         const groundTopPercentage = 0.8; // 80% from top
+         const groundTopPixels = gameAreaHeight * groundTopPercentage;
+         player.y = groundTopPixels - player.height; // Position character so it touches the ground
+
+         character.style.left = player.x + 'px';
+         character.style.top = player.y + 'px';
+         character.classList.add('character-idle');
+         character.style.transform = 'scaleX(1)';
+
+         // Platform collision detection
+         function checkPlatformCollision(rect1, rect2) {
+             return !(rect1.right < rect2.left ||
+                     rect1.left > rect2.right ||
+                     rect1.bottom < rect2.top ||
+                     rect1.top > rect2.bottom);
+         }
+
+         function getPlatformCollisions() {
+             const charRect = {
+                 left: player.x,
+                 right: player.x + player.width,
+                 top: player.y,
+                 bottom: player.y + player.height
+             };
+
+             const platforms = document.querySelectorAll('.platform, .ground-floor');
+             const collisions = [];
+
+             platforms.forEach(platform => {
+                 const platRect = {
+                     left: platform.offsetLeft,
+                     right: platform.offsetLeft + platform.offsetWidth,
+                     top: platform.offsetTop,
+                     bottom: platform.offsetTop + platform.offsetHeight
+                 };
+
+                 if (checkPlatformCollision(charRect, platRect)) {
+                     collisions.push({
+                         platform: platform,
+                         rect: platRect,
+                         side: getCollisionSide(charRect, platRect)
+                     });
+                 }
+             });
+
+             return collisions;
+         }
+
+         function getCollisionSide(charRect, platRect) {
+             const overlapLeft = charRect.right - platRect.left;
+             const overlapRight = platRect.right - charRect.left;
+             const overlapTop = charRect.bottom - platRect.top;
+             const overlapBottom = platRect.bottom - charRect.top;
+
+             const minOverlap = Math.min(overlapLeft, overlapRight, overlapTop, overlapBottom);
+
+             if (minOverlap === overlapTop) return 'top';
+             if (minOverlap === overlapBottom) return 'bottom';
+             if (minOverlap === overlapLeft) return 'left';
+             if (minOverlap === overlapRight) return 'right';
+
+             return 'top';
+         }
+
+         function resolveCollisions() {
+             const collisions = getPlatformCollisions();
+
+             if (collisions.length === 0) {
+                 player.onGround = false;
+                 return;
+             }
+
+             collisions.sort((a, b) => {
+                 const aOverlap = Math.min(
+                     Math.abs((a.rect.left + a.rect.right) / 2 - (player.x + player.width / 2)),
+                     Math.abs((a.rect.top + a.rect.bottom) / 2 - (player.y + player.height / 2))
+                 );
+                 const bOverlap = Math.min(
+                     Math.abs((b.rect.left + b.rect.right) / 2 - (player.x + player.width / 2)),
+                     Math.abs((b.rect.top + a.rect.bottom) / 2 - (player.y + player.height / 2))
+                 );
+                 return aOverlap - bOverlap;
+             });
+
+             const collision = collisions[0];
+             const side = collision.side;
+
+             if (side === 'top' || side === 'bottom') {
+                 if (side === 'top') {
+                     player.y = collision.rect.top - player.height;
+                     player.velY = 0;
+                     player.onGround = true;
+                 } else {
+                     player.y = collision.rect.bottom;
+                     player.velY = 0;
+                 }
+             } else if (side === 'left' || side === 'right') {
+                 if (side === 'left') {
+                     player.x = collision.rect.left - player.width;
+                 } else {
+                     player.x = collision.rect.right;
+                 }
+                 player.velX = 0;
+             }
+         }
+
+         // Game loop
+         function gameLoop() {
+             gameLoopId = requestAnimationFrame(gameLoop);
+
+             handleInput();
+             updatePhysics();
+             resolveCollisions();
+
+             character.style.left = player.x + 'px';
+             character.style.top = player.y + 'px';
+
+             // Update rescuer interaction hint
+             updateRescuerHint();
+
+             // Earthquake effects
+             updateEarthquakeEffects();
+
+             // Check win condition
+             checkWinCondition();
+         }
+
+         function handleInput() {
+             let moved = false;
+
+             if (keys['d'] || keys['ArrowRight']) {
+                 player.velX = player.speed;
+                 lastDirection = 'right';
+                 startWalkAnimation('right');
+                 moved = true;
+             } else if (keys['a'] || keys['ArrowLeft']) {
+                 player.velX = -player.speed;
+                 lastDirection = 'left';
+                 startWalkAnimation('left');
+                 moved = true;
+             } else {
+                 player.velX *= player.friction;
+                 stopWalkAnimation();
+             }
+
+             if ((keys['w'] || keys['ArrowUp'] || keys[' ']) && player.onGround) {
+                 player.velY = player.jumpPower;
+                 player.onGround = false;
+                 moved = true;
+             }
+         }
+
+         function startWalkAnimation(direction) {
+             const character = document.getElementById('character');
+
+             character.classList.remove('character-idle', 'walk-animation', 'walk-left');
+
+             if (direction === 'left') {
+                 character.classList.add('walk-left');
+             } else {
+                 character.classList.add('walk-animation');
+             }
+         }
+
+         function stopWalkAnimation() {
+             const character = document.getElementById('character');
+
+             character.classList.remove('walk-animation', 'walk-left');
+
+             character.classList.add('character-idle');
+
+             if (lastDirection === 'left') {
+                 character.style.transform = 'scaleX(-1)';
+             } else {
+                 character.style.transform = 'scaleX(1)';
+             }
+         }
+
+         function updatePhysics() {
+             if (!player.onGround) {
+                 player.velY += player.gravity;
+             }
+
+             player.x += player.velX;
+             player.y += player.velY;
+
+             const bgBoundaries = getBackgroundBoundaries();
+
+             if (player.x < bgBoundaries.left) {
+                 player.x = bgBoundaries.left;
+                 player.velX = 0;
+             }
+             if (player.x + player.width > bgBoundaries.right) {
+                 player.x = bgBoundaries.right - player.width;
+                 player.velX = 0;
+             }
+
+             if (player.y < 0) player.y = 0;
+             if (player.y > gameArea.offsetHeight - player.height) {
+                 player.y = gameArea.offsetHeight - player.height;
+                 player.velY = 0;
+                 player.onGround = true;
+             }
+         }
+
+         function getBackgroundBoundaries() {
+             return {
+                 left: 0,
+                 right: gameArea.offsetWidth,
+                 top: 0,
+                 bottom: gameArea.offsetHeight
+             };
+         }
+
+         function startScreenShaking() {
+             isScreenShaking = true;
+             shakeIntensity = 5;
+         }
+
+         function updateEarthquakeEffects() {
+             aftershockTimer++;
+
+             if (isScreenShaking) {
+                 // Create screen shaking effect
+                 const shakeX = (Math.random() - 0.5) * shakeIntensity;
+                 const shakeY = (Math.random() - 0.5) * shakeIntensity;
+
+                 const gameContainer = document.getElementById('gameContainer');
+                 gameContainer.style.transform = `translateX(-150px) translate(${shakeX}px, ${shakeY}px)`;
+             }
+         }
+
+         function checkRescuerCollision() {
+             const rescuer = document.getElementById('interactiveRescuer');
+             if (!rescuer) return false;
+
+             const rescuerRect = {
+                 left: rescuer.offsetLeft,
+                 right: rescuer.offsetLeft + rescuer.offsetWidth,
+                 top: rescuer.offsetTop,
+                 bottom: rescuer.offsetTop + rescuer.offsetHeight
+             };
+
+             const charRect = {
+                 left: player.x,
+                 right: player.x + player.width,
+                 top: player.y,
+                 bottom: player.y + player.height
+             };
+
+             return !(charRect.right < rescuerRect.left ||
+                     charRect.left > rescuerRect.right ||
+                     charRect.bottom < rescuerRect.top ||
+                     charRect.top > rescuerRect.bottom);
+         }
+
+         function handleRescuerInteraction() {
+             if (checkRescuerCollision()) {
+                 markInteraction();
+                 showRescuerStory();
+             }
+         }
+
+         function showRescuerStory() {
+             completeLevel();
+         }
+
+         function updateRescuerHint() {
+             const rescuerHint = document.getElementById('rescuerHint');
+             if (rescuerHint && checkRescuerCollision()) {
+                 rescuerHint.style.opacity = '1';
+             } else if (rescuerHint) {
+                 rescuerHint.style.opacity = '0';
+             }
+         }
+
+         function completeLevel() {
+             stopGameLoop();
+
+             // Mark level 4 as completed and unlock fire track
+             markLevel4Completed();
+
+             document.getElementById('completionOverlay').style.display = 'flex';
+         }
+
+         function markLevel4Completed() {
+             console.log('Marking level 4 as completed and unlocking fire track');
+
+             // Use the global markLevelCompleted function from chapters.html if available
+             if (window.markLevelCompleted) {
+                 try {
+                     window.markLevelCompleted('Earthquake', 4);
+                     console.log('Level 4 marked as completed via chapters.html system');
+                 } catch (error) {
+                     console.error('Error calling markLevelCompleted:', error);
+                     updateProgressionFallback('Earthquake', 4);
+                 }
+             } else {
+                 console.log('chapters.html system not available, using fallback');
+                 updateProgressionFallback('Earthquake', 4);
+             }
+         }
+
+         function updateProgressionFallback(track, level) {
+             const saved = localStorage.getItem('escape-the-disaster-track-progress');
+             let trackStates = {};
+
+             if (saved) {
+                 trackStates = JSON.parse(saved);
+             } else {
+                 trackStates = {
+                     Earthquake: { 1: 'unlocked', 2: 'locked', 3: 'locked', 4: 'locked', 5: 'locked' },
+                     Fire: { isUnlocked: false, levels: { 1: 'locked', 2: 'locked', 3: 'locked', 4: 'locked', 5: 'locked' } }
+                 };
+             }
+
+             if (trackStates[track]) {
+                 if (trackStates[track].levels) {
+                     trackStates[track].levels[level] = 'completed';
+                 } else {
+                     trackStates[track][level] = 'completed';
+                 }
+             }
+
+             // Unlock next level if exists (level 5)
+             const nextLevel = level + 1;
+             if (nextLevel <= 5) {
+                 if (trackStates[track].levels) {
+                     trackStates[track].levels[nextLevel] = 'unlocked';
+                 } else {
+                     trackStates[track][nextLevel] = 'unlocked';
+                 }
+             }
+
+             // Unlock Fire track when completing level 4
+             trackStates.Fire.isUnlocked = true;
+             trackStates.Fire.levels[1] = 'unlocked';
+
+             localStorage.setItem('escape-the-disaster-track-progress', JSON.stringify(trackStates));
+             console.log('Fire track unlocked via fallback system');
+         }
+
+
+         function unlockFireTrack() {
+             console.log('View Unlocked Tracks button clicked');
+
+             // Ensure level 4 is marked as completed
+             markLevel4Completed();
+
+             // Navigate to chapters.html which will show the Fire track as unlocked
+             window.location.href = 'chapters.html';
+         }
+
+         function mainMenu() {
+             window.location.href = 'index.html';
+         }
+
+         function startLevel() {
+             document.getElementById('storyText').style.display = 'none';
+
+             earthquakeIntensity = 5;
+
+             // Start screen shaking after 5 seconds
+             setTimeout(() => {
+                 startScreenShaking();
+             }, 5000);
+
+             startInteractionTimer();
+
+             startGameLoop();
+         }
+
+         function startInteractionTimer() {
+             if (interactionTimer) {
+                 clearTimeout(interactionTimer);
+             }
+
+             interactionTimer = setTimeout(() => {
+                 if (!hasInteracted) {
+                     showDeathScreen();
+                 }
+             }, 8000); // 8 seconds for final level
+         }
+
+         function markInteraction() {
+             hasInteracted = true;
+             if (interactionTimer) {
+                 clearTimeout(interactionTimer);
+                 interactionTimer = null;
+             }
+         }
+
+         function showDeathScreen() {
+             stopGameLoop();
+
+             const deathOverlay = document.getElementById('deathOverlay');
+             deathOverlay.style.display = 'flex';
+
+             setTimeout(() => {
+                 deathOverlay.classList.add('show');
+             }, 100);
+         }
+
+         function hideDeathScreen() {
+             const deathOverlay = document.getElementById('deathOverlay');
+             deathOverlay.classList.remove('show');
+
+             setTimeout(() => {
+                 deathOverlay.style.display = 'none';
+             }, 500);
+         }
+
+         function tryAgain() {
+             console.log('Try Again button clicked');
+             hideDeathScreen();
+             hasInteracted = false;
+             setTimeout(() => {
+                 window.location.reload();
+             }, 600);
+         }
+
+         function deathMainMenu() {
+             console.log('Death Main Menu button clicked');
+             hideDeathScreen();
+             setTimeout(() => {
+                 window.location.href = 'index.html';
+             }, 600);
+         }
+
+         function startGameLoop() {
+             if (!gameLoopId) {
+                 gameLoop();
+             }
+         }
+
+         function stopGameLoop() {
+             if (gameLoopId) {
+                 cancelAnimationFrame(gameLoopId);
+                 gameLoopId = null;
+             }
+         }
+
+         function checkWinCondition() {
+             // Win condition is handled by rescuer interaction only
+             // No additional win conditions needed
+         }
+
+         // Input handling
+         document.addEventListener('keydown', (e) => {
+             keys[e.key.toLowerCase()] = true;
+             if (e.key === ' ') e.preventDefault();
+
+             if (e.key.toLowerCase() === 'e') {
+                 e.preventDefault();
+                 if (checkRescuerCollision()) {
+                     handleRescuerInteraction();
+                 }
+             }
+         });
+
+         document.addEventListener('keyup', (e) => {
+             keys[e.key.toLowerCase()] = false;
+         });
+
+         // Initialize
+         document.addEventListener('DOMContentLoaded', () => {
+             console.log('Initializing 4e.html level...');
+             document.getElementById('storyText').style.display = 'block';
+
+             // Ensure overlays are hidden at start
+             const completionOverlay = document.getElementById('completionOverlay');
+             const deathOverlay = document.getElementById('deathOverlay');
+
+             if (completionOverlay) {
+                 completionOverlay.style.display = 'none';
+                 console.log('Completion overlay hidden at start');
+             }
+
+             if (deathOverlay) {
+                 deathOverlay.style.display = 'none';
+                 deathOverlay.classList.remove('show');
+                 console.log('Death overlay hidden at start');
+             }
+
+             // Mark level as in_progress if chapters.html system is available
+             if (window.trackProgressionInstance && window.trackProgressionInstance.setLevelState) {
+                 window.trackProgressionInstance.setLevelState('Earthquake', 4, 'in_progress');
+             }
+
+             if (window.loadGameState) {
+                 window.loadGameState();
+             }
+
+             console.log('4e.html initialization complete');
+         });
+
+         window.completeLevel = completeLevel;
+
+         window.loadGameState = function() {
+             const saved = localStorage.getItem('surviveTheDisaster_progress');
+             if (saved) {
+                 window.gameState = JSON.parse(saved);
+             } else {
+                 window.gameState = {
+                     earthquake: { completed: [], currentLevel: 0 },
+                     fire: { completed: [], currentLevel: 0 },
+                     unlockedTracks: ['earthquake'],
+                     totalProgress: 0
+                 };
+             }
+         };
+
+         window.saveGameState = function() {
+             if (window.gameState) {
+                 localStorage.setItem('surviveTheDisaster_progress', JSON.stringify(window.gameState));
+             }
+         };
+
+         // Test function for debugging
+         window.test4eCompletion = function() {
+             console.log('Testing 4e.html completion system');
+             completeLevel();
+         };
+     </script>
+
+     <!-- Touch Controls for Mobile -->
+     <script src="touch-controls.js"></script>
+ </body>
+ </html>

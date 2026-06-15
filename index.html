@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <meta name="description" content="An educational disaster survival game for STI students - learn earthquake and fire emergency procedures" />
+  <meta name="theme-color" content="#00b7ff" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="AppSTD4.0" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" type="image/svg+xml" href="icons/favicon.svg" />
+  <link rel="apple-touch-icon" href="icons/favicon.svg" />
+  <title>Survive The Disaster - Game Menu</title>
+
+  <!-- Pixelated font -->
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
+
+  <!-- External CSS -->
+  <link rel="stylesheet" href="index.css" />
+</head>
+<body>
+  <!-- Background Music -->
+  <audio id="bgm" type="autoplay/mpeg" src="MainBgAudio.mp3"></audio>
+ 
+  <!-- Backdrop for overlays -->
+  <div id="overlayBackdrop" class="overlay-backdrop"></div>
+
+  <!-- Game Title -->
+  <h1 class="game-title">Survive<br><br> The<br><br> Disaster</h1>
+  
+  <!-- Buttons -->
+  <div class="button-container">
+    <button class="menu-button" onclick="location.href='chapters.html'">Start</button>
+    <button class="menu-button" onclick="showOverlay('creditsOverlay')">Credits</button>
+    <button class="menu-button" onclick="showOverlay('settingsOverlay')">Settings</button>
+    <button class="menu-button" onclick="showOverlay('faqOverlay')">FAQ</button>
+  </div>
+
+  <!-- Credits Overlay -->
+  <div id="creditsOverlay" class="overlay" role="dialog" aria-modal="true" aria-labelledby="creditsTitle" tabindex="-1">
+    <h2 id="creditsTitle">Game Credits</h2>
+    <p><strong>Developed by:</strong> Cy</p>
+    <p><strong>Art:</strong> Sean <p>
+      <p><strong>Paperworks:</strong> Chrislie <p></p>
+    <button class="close-btn" onclick="hideOverlay('creditsOverlay')">Close</button>
+  </div>
+
+  <!-- Settings Overlay -->
+  <div id="settingsOverlay" class="overlay" role="dialog" aria-modal="true" aria-labelledby="settingsTitle" tabindex="-1">
+    <h2 id="settingsTitle">Settings</h2>
+    
+    <div class="setting-option">
+  <button class="mute-btn" aria-label="Mute/unmute music" onclick="toggleAudio()">🔊 Mute</button>
+    </div>
+
+    <div class="setting-option volume-container">
+      <label for="volumeSlider">Volume:</label>
+      <input type="range" id="volumeSlider" class="volume-slider" min="0" max="1" step="0.01" value="0.5" aria-valuemin="0" aria-valuemax="1" aria-valuenow="0.5" />
+    </div>
+
+    <div class="setting-option">
+      <button id="fullscreenBtn" onclick="toggleFullscreen()">Toggle Fullscreen</button>
+    </div>
+
+    <button class="close-btn" onclick="hideOverlay('settingsOverlay')">Close</button>
+  </div>
+
+  <!-- FAQ Overlay -->
+  <div id="faqOverlay" class="overlay" role="dialog" aria-modal="true" aria-labelledby="faqTitle" tabindex="-1">
+    <h2 id="faqTitle">Frequently Asked Questions</h2>
+    <div class="faq-content">
+      <div class="faq-item">
+        <h3>How do I start the game?</h3>
+        <p>Click the "Start" button on the main menu to begin your adventure.</p>
+      </div>
+      <div class="faq-item">
+        <h3>What are the different disasters?</h3>
+        <p>The game features earthquake and fire disasters. Each has unique challenges and strategies.</p>
+      </div>
+      <div class="faq-item">
+        <h3>What is the goal of our website?</h3>
+        <p>Our goal with our website is to give awereness to grade 11 STI student about what they have to do in emergency situations.</p>
+      </div>
+      <div class="faq-item">
+        <h3>Can I adjust the volume?</h3>
+        <p>Yes, use the volume slider in the Settings menu to control the background music.</p>
+      </div>
+      <div class="faq-item">
+        <h3>What does fullscreen mode do?</h3>
+        <p>Fullscreen mode expands the game to fill your entire screen for a more immersive experience.</p>
+      </div>
+      <div class="faq-item">
+        <h3>How do I mute the audio?</h3>
+        <p>Click the "🔊 Mute" button in the Settings menu to toggle audio on and off.</p>
+      </div>
+    </div>
+    <button class="close-btn" onclick="hideOverlay('faqOverlay')">Close</button>
+  </div>
+
+
+  </div>
+
+  <!-- External JS -->
+  <script src="index.js" defer></script>
+
+  <!-- Shared button sound script -->
+  <script src="audio.js"></script>
+
+  <!-- Service Worker Registration for PWA -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then((registration) => {
+            console.log('Service Worker registered with scope:', registration.scope);
+          })
+          .catch((error) => {
+            console.log('Service Worker registration failed:', error);
+          });
+      });
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,1156 @@
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: 'Press Start 2P', monospace;
+  overflow: hidden;
+}
+body {
+  width: 100vw;
+  height: 100vh;
+}
+.game {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  background: none;
+  overflow: hidden;
+  image-rendering: pixelated;
+}
+.battlefield {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100vw;
+  height: 100vh;
+  image-rendering: pixelated;
+  overflow: hidden;
+}
+.sprite {
+  position: absolute;
+  image-rendering: pixelated;
+  background: transparent;
+}
+/* Player sprite higher up */
+#player {
+  bottom: 3vh;
+  width: 140px;
+  z-index: 2;
+}
+/* Player HP bar just above player sprite */
+.player-hp-bar {
+  position: absolute;
+  left: 8vw;
+  bottom: 50%;
+  width: 220px;
+  background: #fff;
+  padding: 4px;
+  border: 4px solid #222;
+  font-size: 12px;
+  box-shadow: 0 0 0 4px #222;
+  border-radius: 0;
+  image-rendering: pixelated;
+  z-index: 3;
+  margin-left: 3%;
+  margin-bottom: 3%;
+}
+/* pag hiwalayin si enemy2 kay enemy, para ma position ng ayos si enemy2*/
+#enemy-animation {
+  top: 20%;
+  right: 10vw;
+  transform: translateY(-50%);
+  width: 500px;
+  z-index: 2;
+  margin-right: 50%;
+  margin-top: 15%;
+}
+#enemy2-animation {
+  top: 10%;
+  right: 10vw;
+  transform: translateY(-50%);
+  width: 500px;
+  z-index: 2;
+  margin-right: 20%;
+  margin-top: 2%;
+}  
+/* Enemy HP bar to the left of enemy sprite */
+.enemy-hp-bar {
+  position: absolute;
+  top: 20%;
+  right: calc(10vw + 160px);
+  transform: translateY(-50%);
+  width: 220px;
+  background: #fff;
+  padding: 4px;
+  border: 4px solid #222;
+  font-size: 12px;
+  box-shadow: 0 0 0 4px #222;
+  border-radius: 0;
+  image-rendering: pixelated;
+  z-index: 3;
+  margin-right: 30%;
+  margin-bottom: 58%;
+}
+.hp-fill {
+  background: linear-gradient(90deg, #44ff44 0%, #228822 100%);
+  height: 16px;
+  transition: width 0.5s;
+  border-radius: 0;
+  image-rendering: pixelated;
+}
+/* Timer in upper right */
+.timer {
+  position: absolute;
+  top: 24px;
+  right: 8vw;
+  background: #222;
+  color: #fff;
+  font-size: 16px;
+  font-family: 'Press Start 2P', monospace;
+  padding: 8px 16px;
+  border: 4px solid #ff4444;
+  border-radius: 0;
+  z-index: 15;
+  white-space: nowrap;
+  box-shadow: 0 0 0 4px #222;
+  image-rendering: pixelated;
+}
+/* Pause/music button group */
+.pause-music-group {
+  position: absolute;
+  top: 24px;
+  left: 8vw;
+  z-index: 20;
+  display: flex;
+  gap: 12px;
+}
+.pm-btn {
+  background: #fff url('https://www.transparenttextures.com/patterns/pixel-weave.png');
+  border: 4px solid #222;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 13px;
+  padding: 8px 16px;
+  cursor: pointer;
+  box-shadow: 0 0 0 4px #222;
+  border-radius: 0;
+  color: #222;
+  image-rendering: pixelated;
+  transition: background 0.1s;
+}
+.pm-btn.active {
+  background: #d0d0d0 url('https://www.transparenttextures.com/patterns/pixel-weave.png');
+}
+
+/* Fixed message box at bottom left */
+.message-box-fixed {
+  position: fixed;
+  left: 170px;
+  bottom: 32px;
+  width: 48vw;
+  min-width: 320px;
+  max-width: 700px;
+  background: #fff url('https://www.transparenttextures.com/patterns/pixel-weave.png');
+  border: 4px solid #222;
+  box-shadow: 0 0 0 4px #222;
+  border-radius: 0;
+  padding: 16px 24px;
+  z-index: 30;
+  font-size: 20px;
+  color: #222;
+  pointer-events: auto;
+}
+.message {
+  font-size: 20px;
+  margin: 0;
+  background: none;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  image-rendering: pixelated;
+  min-height: 80px;
+  overflow: auto;
+  width: 100%;
+  color: #222;
+}
+#text-content {
+  white-space: pre-wrap;
+}
+#cursor {
+  display: inline;
+  color: #222;
+  animation: blink 1s steps(2) infinite;
+}
+/* Fixed choices box at bottom right */
+.choices-box-fixed {
+  position: fixed;
+  right: 210px;
+  bottom: 32px;
+  width: 340px;
+  background: #fff url('https://www.transparenttextures.com/patterns/pixel-weave.png');
+  box-shadow: 0 0 0 4px #222;
+  border-radius: 0;
+  padding: 16px 24px;
+  z-index: 30;
+  pointer-events: auto;
+}
+.choices {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  image-rendering: pixelated;
+}
+.choices.hidden {
+  display: none;
+}
+.choices button {
+  display: block;
+  width: 100%;
+  padding: 18px 8px;
+  background: #fff url('https://www.transparenttextures.com/patterns/pixel-weave.png');
+  font-family: 'Press Start 2P', monospace;
+  font-size: 20px;
+  cursor: pointer;
+  color: #222;
+  image-rendering: pixelated;
+  transition: background 0.1s;
+  margin-bottom: 0;
+  text-align: left;
+}
+.choices button:disabled {
+  background: #aaa;
+  color: #666;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+.choices button:hover:not(:disabled) {
+  background: #d0d0d0 url('https://www.transparenttextures.com/patterns/pixel-weave.png');
+}
+@keyframes blink {
+  0%, 50%   { opacity: 1; }
+  51%,100%  { opacity: 0; }
+}
+@keyframes shake {
+  0% { transform: translate(0, 0); }
+  25% { transform: translate(-5px, 0); }
+  50% { transform: translate(5px, 0); }
+  75% { transform: translate(-5px, 0); }
+  100% { transform: translate(0, 0); }
+}
+.shake { animation: shake 0.4s; }
+@keyframes flash {
+  0%, 100% { filter: brightness(1); }
+  50% { filter: brightness(3); }
+}
+.flash { animation: flash 0.4s; }
+
+.fade-out {
+  animation: fadeOut 0.75s ease-out forwards;
+}
+
+@keyframes fadeOut {
+  to { opacity: 0; }
+}
+@media (max-width: 900px) {
+}
+
+/* Settings Modal */
+.settings-modal {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  background: rgba(0,0,0,0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+.settings-modal.hidden {
+  display: none;
+}
+.settings-content {
+  background: #fff url('https://www.transparenttextures.com/patterns/pixel-weave.png');
+  padding: 24px;
+  border: 4px solid #222;
+  box-shadow: 0 0 0 4px #222;
+  text-align: center;
+  font-family: 'Press Start 2P', monospace;
+  color: #222;
+  width: 400px;
+}
+.settings-content h2 {
+  margin-bottom: 20px;
+}
+.settings-content button {
+  margin-top: 20px;
+  padding: 12px 20px;
+  border: 4px solid #222;
+  cursor: pointer;
+  font-family: 'Press Start 2P', monospace;
+}
+.settings-content input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 8px;
+  background: #222;
+  outline: none;
+  border: 2px solid #222;
+  border-radius: 0;
+  image-rendering: pixelated;
+}
+.settings-content input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  background: #fff;
+  border: 2px solid #222;
+  cursor: pointer;
+  image-rendering: pixelated;
+}
+.settings-content input[type="range"]::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  background: #fff;
+  border: 2px solid #222;
+  cursor: pointer;
+  image-rendering: pixelated;
+}
+.settings-content label {
+  display: block;
+  margin-bottom: 10px;
+  font-size: 12px;
+}
+
+
+/* Floating animation for sprites after cutscene */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+.floating {
+  animation: float 2s ease-in-out infinite;
+}
+
+/* Paused state: disable interactions */
+.battlefield.paused {
+  pointer-events: none;
+}
+
+/* Cutscene fade transitions */
+#cutscene {
+  transition: opacity 0.5s ease-out;
+}
+
+#cutscene.fade-out {
+  opacity: 0;
+}
+
+/* Effect overlay for flashes and lighting */
+.effect-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 10;
+  opacity: 0;
+  transition: opacity 0.1s;
+}
+
+/* Cutscene overlay styling */
+#cutscene {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 99;
+  cursor: pointer;
+  outline: none; /* Remove default focus outline */
+}
+
+/* Enhanced screen shake variations */
+.shake-light {
+  animation: shakeLight 0.3s;
+}
+
+.shake-medium {
+  animation: shakeMedium 0.4s;
+}
+
+.shake-heavy {
+  animation: shakeHeavy 0.5s;
+}
+
+@keyframes shakeLight {
+  0%, 100% { transform: translate(0, 0); }
+  25% { transform: translate(-2px, 0); }
+  50% { transform: translate(2px, 0); }
+  75% { transform: translate(-2px, 0); }
+}
+
+@keyframes shakeMedium {
+  0%, 100% { transform: translate(0, 0); }
+  25% { transform: translate(-5px, 0); }
+  50% { transform: translate(5px, 0); }
+  75% { transform: translate(-5px, 0); }
+}
+
+@keyframes shakeHeavy {
+  0%, 100% { transform: translate(0, 0); }
+  25% { transform: translate(-8px, 0); }
+  50% { transform: translate(8px, 0); }
+  75% { transform: translate(-8px, 0); }
+}
+
+/* Color flash effects */
+.damage-flash {
+  background: rgba(255, 0, 0, 0.4);
+  animation: flashEffect 0.5s ease-out;
+}
+
+.victory-flash {
+  background: rgba(0, 183, 255, 0.4);
+  animation: flashEffect 0.8s ease-out;
+}
+
+.special-flash {
+  background: rgba(255, 215, 0, 0.3);
+  animation: flashEffect 0.6s ease-out;
+}
+
+.success-flash {
+  background: rgba(0, 255, 0, 0.2);
+  animation: flashEffect 0.3s ease-out;
+}
+
+@keyframes flashEffect {
+  0%, 100% { opacity: 0; }
+  50% { opacity: 1; }
+}
+
+/* Improved flash for sprites */
+.flash {
+  animation: flash 0.4s;
+}
+@keyframes flash {
+  0%, 100% { filter: brightness(1); }
+  50% { filter: brightness(1.5); }
+}
+
+/* Player Defeat Animation - Earthquake (Enemy 1) */
+@keyframes playerDefeatedEarthquake {
+  0% { opacity: 1; }
+  20% { opacity: 1; }
+  40% { opacity: 1; }
+  60% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { opacity: 1; }
+}
+
+/* Player Defeat Animation - Fire (Enemy 2) */
+@keyframes playerDefeatedFire {
+  0% { opacity: 1; }
+  33% { opacity: 1; }
+  66% { opacity: 1; }
+  100% { opacity: 1; }
+}
+
+/* Player defeat animation classes */
+.player-defeated-earthquake {
+  animation: playerDefeatedEarthquake 2s steps(5) infinite;
+}
+
+.player-defeated-fire {
+  animation: playerDefeatedFire 1.5s steps(3) infinite;
+}
+
+/* Ensure defeated frames are properly positioned */
+.player-frame.defeated {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* Achievement Alert */
+.achievement-alert {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 3000;
+  max-width: 300px;
+  width: 90%;
+}
+
+.alert-content {
+  background: rgba(0, 0, 0, 0.95);
+  border: 3px solid #00b7ff;
+  border-radius: 15px;
+  padding: 15px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  box-shadow: 0 0 20px rgba(0, 183, 255, 0.5);
+  cursor: pointer;
+  font-family: 'Press Start 2P';
+  color: #fff;
+  transform: translateY(100px);
+  opacity: 0;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.achievement-alert.show .alert-content {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.alert-icon img {
+  width: 60px;
+  height: 60px;
+  border-radius: 8px;
+  border: 2px solid #00b7ff;
+}
+
+.alert-text h3 {
+  margin: 0 0 5px 0;
+  color: #00b7ff;
+  font-size: 10px;
+}
+
+.alert-text p {
+  margin: 0 0 5px 0;
+  font-size: 12px;
+  color: #fff;
+}
+
+.alert-text span {
+  font-size: 8px;
+  color: #ccc;
+  background: rgba(0, 183, 255, 0.2);
+  padding: 2px 5px;
+  border-radius: 5px;
+}
+
+/* Alert responsive */
+@media (max-width: 768px) {
+  .achievement-alert {
+    bottom: 10px;
+    right: 10px;
+    max-width: 250px;
+  }
+
+  .alert-content {
+    padding: 10px;
+    gap: 10px;
+  }
+
+  .alert-icon img {
+    width: 50px;
+    height: 50px;
+  }
+
+  .alert-text h3 {
+    font-size: 9px;
+  }
+
+  .alert-text p {
+    font-size: 10px;
+  }
+
+  .alert-text span {
+    font-size: 7px;
+  }
+}
+
+/* ==========================================
+   TOUCH CONTROLS - Mobile Joystick
+   ========================================== */
+
+/* Touch controls container - Always visible for mobile game */
+#touch-controls {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 180px;
+  pointer-events: none;
+  z-index: 1000;
+  display: flex;
+  visibility: visible;
+}
+
+/* Extra small screens - larger touch targets */
+@media (max-width: 480px) {
+  #touch-controls {
+    height: 160px;
+  }
+  
+  #lr-control-area {
+    bottom: 20px;
+    left: 20px;
+    width: 120px;
+    height: 55px;
+  }
+  
+  #left-arrow,
+  #right-arrow {
+    width: 55px;
+    height: 55px;
+    font-size: 24px;
+  }
+  
+  .touch-btn {
+    width: 60px;
+    height: 60px;
+    bottom: 30px;
+    right: 25px;
+    font-size: 16px;
+  }
+  
+  }
+
+/* Left-Right Arrow Control Area */
+#lr-control-area {
+  position: absolute;
+  bottom: 30px;
+  left: 30px;
+  width: 140px;
+  height: 65px;
+  pointer-events: auto;
+}
+
+/* Left Arrow */
+#left-arrow {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 65px;
+  height: 65px;
+  background: rgba(255, 255, 255, 0.15);
+  border: 3px solid rgba(255, 255, 255, 0.4);
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  color: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(5px);
+  transition: all 0.15s ease;
+  cursor: pointer;
+  user-select: none;
+}
+
+#left-arrow:active,
+#left-arrow.active {
+  background: rgba(255, 100, 100, 0.5);
+  border-color: #ff6464;
+  color: #fff;
+  box-shadow: 0 0 25px rgba(255, 100, 100, 0.6);
+  transform: translateY(-50%) scale(0.95);
+}
+
+/* Right Arrow */
+#right-arrow {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 65px;
+  height: 65px;
+  background: rgba(255, 255, 255, 0.15);
+  border: 3px solid rgba(255, 255, 255, 0.4);
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  color: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(5px);
+  transition: all 0.15s ease;
+  cursor: pointer;
+  user-select: none;
+}
+
+#right-arrow:active,
+#right-arrow.active {
+  background: rgba(100, 255, 100, 0.5);
+  border-color: #64ff64;
+  color: #fff;
+  box-shadow: 0 0 25px rgba(100, 255, 100, 0.6);
+  transform: translateY(-50%) scale(0.95);
+}
+
+/* Action button */
+.touch-btn {
+  position: absolute;
+  bottom: 40px;
+  right: 40px;
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  border: 3px solid;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 18px;
+  cursor: pointer;
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.1s, box-shadow 0.1s;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+/* Action button (E key) */
+#touch-action-btn {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.5);
+  color: #fff;
+  box-shadow: 0 0 20px rgba(0, 183, 255, 0.3);
+}
+
+#touch-action-btn:active,
+#touch-action-btn.active {
+  background: rgba(0, 183, 255, 0.6);
+  border-color: #00b7ff;
+  transform: scale(0.95);
+  box-shadow: 0 0 30px rgba(0, 183, 255, 0.6);
+}
+
+
+/* ==========================================
+   RESPONSIVE GAME UI - Mobile Scaling
+   ========================================== */
+
+/* ==========================================
+   MOBILE RESPONSIVE - Small screens (320px+)
+   ========================================== */
+
+/* Base mobile styles - 600px and below */
+@media (max-width: 600px) {
+  /* Remove transform scale - use flexible units instead */
+  .game, .battlefield {
+    transform: none !important;
+    width: 100vw !important;
+    height: 100vh !important;
+  }
+  
+  /* Scale player sprite */
+  #player {
+    width: 25vw !important;
+    max-width: 100px;
+    bottom: 3vh !important;
+  }
+  
+  /* HP bars - use flex, not transform */
+  .player-hp-bar,
+  .enemy-hp-bar {
+    transform: none !important;
+    width: 35vw !important;
+    max-width: 150px;
+    font-size: 8px !important;
+    padding: 3px !important;
+    border-width: 2px !important;
+  }
+  
+  .player-hp-bar {
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    bottom: 12vh !important;
+    margin-left: 0 !important;
+  }
+  
+  .enemy-hp-bar {
+    top: 8vh !important;
+    right: 3vw !important;
+    margin-right: 0 !important;
+    margin-bottom: 0 !important;
+  }
+  
+  /* Timer */
+  .timer {
+    font-size: 10px !important;
+    padding: 6px 8px !important;
+    border-width: 2px !important;
+  }
+  
+  /* Scale message box */
+  .message-box-fixed {
+    left: 2vw !important;
+    bottom: 2vh !important;
+    width: 96vw !important;
+    min-width: unset !important;
+    max-width: unset !important;
+    padding: 6px 8px !important;
+    border-width: 2px !important;
+  }
+  
+  .message {
+    font-size: 10px !important;
+    min-height: 24px !important;
+  }
+  
+  /* Scale choices box - stack BELOW message box on mobile */
+  .choices-box-fixed {
+    left: 2vw !important;
+    right: 2vw !important;
+    bottom: 2vh !important;
+    width: 96vw !important;
+    max-width: unset !important;
+    padding: 8px 10px !important;
+    border-width: 2px !important;
+  }
+  
+  .choices button {
+    /* Minimum 44px touch target */
+    min-height: 44px !important;
+    padding: 12px 8px !important;
+    font-size: 11px !important;
+    line-height: 1.3 !important;
+  }
+  
+  /* Scale pause/music buttons - larger touch target */
+  .pm-btn {
+    font-size: 8px !important;
+    padding: 8px 10px !important;
+    min-height: 44px !important;
+    border-width: 2px !important;
+  }
+  
+  /* Enemy scaling - proportional, keep pixelated */
+  #enemy-animation,
+  #enemy2-animation {
+    width: 30vw !important;
+    max-width: 150px !important;
+    top: 5vh !important;
+    left: 5vw !important;
+    right: auto !important;
+    transform: none !important;
+    margin-right: 0 !important;
+    margin-top: 0 !important;
+  }
+  
+  /* HP fill adjustment */
+  .hp-fill {
+    height: 10px !important;
+  }
+  
+  /* Reduce gap between choice buttons */
+  .choices {
+    gap: 6px !important;
+  }
+}
+
+/* ==========================================
+   EXTRA SMALL SCREENS - iPhone SE, older Androids (320px)
+   ========================================== */
+@media (max-width: 380px) {
+  /* Keep flexible units, no transform scaling */
+  .game, .battlefield {
+    transform: none !important;
+    width: 100vw !important;
+    height: 100vh !important;
+  }
+  
+  /* Enemy sprite - smaller but proportional */
+  #enemy-animation {
+    width: 25vw !important;
+    max-width: 100px !important;
+    top: 2vh !important;
+    left: 3vw !important;
+    right: auto !important;
+    transform: none !important;
+    margin-right: 0 !important;
+    margin-top: 0 !important;
+  }
+  
+  /* Enemy HP bar */
+  .enemy-hp-bar {
+    width: 30vw !important;
+    max-width: 100px !important;
+    top: 6vh !important;
+    right: 2vw !important;
+    font-size: 6px !important;
+    margin-right: 0 !important;
+    margin-bottom: 0 !important;
+    transform: none !important;
+    padding: 2px !important;
+    border-width: 2px !important;
+  }
+  
+  /* Player HP bar - centered */
+  .player-hp-bar {
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    bottom: 10vh !important;
+    width: 30vw !important;
+    max-width: 100px !important;
+    font-size: 6px !important;
+    margin-left: 0 !important;
+    margin-bottom: 0 !important;
+    padding: 2px !important;
+    border-width: 2px !important;
+  }
+  
+  /* Timer */
+  .timer {
+    font-size: 8px !important;
+    padding: 4px 6px !important;
+    top: 6px !important;
+    right: 2vw !important;
+    border-width: 2px !important;
+  }
+  
+  /* Settings button */
+  .pm-btn {
+    font-size: 6px !important;
+    padding: 6px 8px !important;
+    top: 6px !important;
+    left: 2vw !important;
+    border-width: 2px !important;
+    min-height: 36px !important;
+  }
+  
+  /* Message box - full width at bottom */
+  .message-box-fixed {
+    left: 1vw !important;
+    bottom: 38vh !important;
+    width: 98vw !important;
+    max-width: 98vw !important;
+    min-width: unset !important;
+    padding: 4px 6px !important;
+    border-width: 2px !important;
+  }
+  
+  .message {
+    font-size: 8px !important;
+    min-height: 20px !important;
+  }
+  
+  /* Choices box - stack BELOW message box, full width */
+  .choices-box-fixed {
+    left: 1vw !important;
+    right: 1vw !important;
+    bottom: 1vh !important;
+    width: 98vw !important;
+    max-width: 98vw !important;
+    padding: 6px 8px !important;
+    border-width: 2px !important;
+  }
+  
+  .choices button {
+    /* Minimum 44px touch target for accessibility */
+    min-height: 44px !important;
+    padding: 10px 6px !important;
+    font-size: 9px !important;
+    line-height: 1.4 !important;
+  }
+  
+  /* Cutscene text */
+  #cutscene {
+    font-size: 4vw !important;
+    text-align: center;
+    padding: 10px;
+  }
+  
+  /* HP fill adjustment */
+  .hp-fill {
+    height: 8px !important;
+  }
+  
+  /* Choice buttons gap */
+  .choices {
+    gap: 4px !important;
+  }
+}
+
+/* ==========================================
+   LANDSCAPE MOBILE - Horizontal orientation
+   ========================================== */
+@media (max-height: 500px) and (orientation: landscape) {
+  #touch-controls {
+    height: 120px;
+  }
+  
+  #touch-joystick-area {
+    width: 100px;
+    height: 100px;
+    bottom: 10px;
+    left: 10px;
+  }
+  
+  #touch-joystick-knob {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .touch-btn {
+    width: 55px;
+    height: 55px;
+    bottom: 20px;
+    right: 20px;
+  }
+  
+  /* Landscape: message box left, choices right */
+  .message-box-fixed {
+    left: 100px !important;
+    bottom: 10px !important;
+    width: 40vw !important;
+    max-width: 300px !important;
+  }
+  
+  .choices-box-fixed {
+    right: 10px !important;
+    bottom: 10px !important;
+    width: 35vw !important;
+    max-width: 250px !important;
+  }
+  
+  /* Smaller enemy in landscape */
+  #enemy-animation,
+  #enemy2-animation {
+    width: 25vw !important;
+    max-width: 180px !important;
+    margin-right: 5vw !important;
+  }
+  
+  /* HP bars smaller in landscape */
+  .player-hp-bar,
+  .enemy-hp-bar {
+    width: 25vw !important;
+    max-width: 120px !important;
+  }
+}
+
+/* ==========================================
+   MOBILE UI CONTAINER - Vertical stacking on small screens
+   ========================================== */
+.mobile-ui-container {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  pointer-events: none;
+}
+
+/* On mobile: stack message above choices */
+@media (max-width: 600px) {
+  .mobile-ui-container {
+    flex-direction: column-reverse;
+    justify-content: flex-start;
+    padding: 0;
+  }
+  
+  .message-box-fixed,
+  .choices-box-fixed {
+    position: relative !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+  }
+}
+
+/* ==========================================
+   TOUCH-FRIENDLY ENHANCEMENTS
+   ========================================== */
+
+/* Ensure all interactive elements have minimum touch target */
+button, 
+.choices button,
+.pm-btn,
+#left-arrow,
+#right-arrow,
+.touch-btn {
+  -webkit-tap-highlight-color: rgba(0, 183, 255, 0.3);
+  touch-action: manipulation;
+}
+
+/* Minimum touch target size for all buttons */
+.choices button {
+  min-height: 44px;
+}
+
+.pm-btn {
+  min-height: 44px;
+}
+
+/* Dynamic font sizing using clamp for responsive text */
+.message {
+  font-size: clamp(8px, 2vw, 16px);
+}
+
+.timer {
+  font-size: clamp(10px, 2vw, 16px);
+}
+
+.choices button {
+  font-size: clamp(10px, 2vw, 14px);
+}
+
+/* Improve choice button layout for readability */
+.choices {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* ==========================================
+   PREVENT OVERSCROLL & MOBILE FIXES
+   ========================================== */
+
+/* Prevent pull-to-refresh and overscroll */
+html, body {
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-x pan-y;
+  overscroll-behavior: contain;
+}
+
+/* Fix for iOS viewport issues */
+@supports (-webkit-touch-callout: none) {
+  html, body {
+    height: -webkit-fill-available;
+  }
+  
+  .game, .battlefield {
+    height: -webkit-fill-available;
+  }
+}
+
+/* Prevent text selection on mobile */
+* {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Allow text selection in inputs */
+input, textarea {
+  -webkit-user-select: auto;
+  -moz-user-select: auto;
+  -ms-user-select: auto;
+  user-select: auto;
+}
+
+/* Hide scrollbars but allow scrolling */
+::-webkit-scrollbar {
+  display: none;
+}
+
+

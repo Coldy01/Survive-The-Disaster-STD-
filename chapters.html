@@ -1,0 +1,2122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <meta name="description" content="An educational disaster survival game for STI students - learn earthquake and fire emergency procedures" />
+  <meta name="theme-color" content="#00b7ff" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="AppSTD4.0" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" type="image/svg+xml" href="icons/favicon.svg" />
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/icon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="icons/icon-16x16.png" />
+  <link rel="apple-touch-icon" href="icons/icon-192x192.png" />
+  <title>Game Intro</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Verdana, sans-serif;
+      overflow: hidden;
+      background: linear-gradient(rgba(112, 111, 111, 0.5), rgba(112, 111, 111, 0.5));
+      background-size: cover;
+      color: #fff;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0;
+      background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5));
+      width: 100%;
+      height: 100%;
+      background-size: cover;
+      filter: brightness(0.9) contrast(1.1) saturate(1.2);
+      z-index: -1;
+    }
+
+
+    /* Track Selection Styles */
+    .track-card {
+      padding: 30px;
+      border: 4px solid;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      min-height: 200px;
+      font-family: 'Press Start 2P';
+      font-size: 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      overflow-y: auto;
+    }
+
+    .track-card.locked {
+      border-color: #666;
+      background: rgba(100, 100, 100, 0.3);
+      color: #999;
+      cursor: not-allowed;
+    }
+
+    .track-card.locked:hover {
+      background: rgba(120, 120, 120, 0.4);
+      border-color: #777;
+    }
+
+    .track-card.unlocked {
+      border-color: #00b7ff;
+      background: rgba(0, 183, 255, 0.1);
+      color: #00b7ff;
+      cursor: pointer;
+      animation: track-pulse 2s infinite;
+    }
+
+    .track-card.unlocked:hover {
+      background: rgba(0, 183, 255, 0.2);
+      border-color: #0022ff;
+      box-shadow: 0 0 25px rgba(0, 183, 255, 0.5);
+    }
+
+    .track-icon {
+      font-size: 48px;
+      margin-bottom: 20px;
+    }
+
+    .track-card.locked .track-icon {
+      color: #666;
+    }
+
+    .track-card.unlocked .track-icon {
+      color: #00b7ff;
+    }
+
+    .track-title {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .track-status {
+      font-size: 12px;
+      opacity: 0.8;
+    }
+
+    .track-tooltip {
+      position: relative;
+    }
+
+    .track-tooltip .track-tooltip-text {
+      visibility: hidden;
+      width: 250px;
+      background-color: rgba(0, 0, 0, 0.9);
+      color: #fff;
+      text-align: center;
+      border-radius: 6px;
+      padding: 10px 15px;
+      position: absolute;
+      z-index: 1001;
+      bottom: 125%;
+      left: 50%;
+      margin-left: -125px;
+      font-family: 'Press Start 2P';
+      font-size: 8px;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .track-tooltip .track-tooltip-text::after {
+      content: "";
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      margin-left: -5px;
+      border-width: 5px;
+      border-style: solid;
+      border-color: rgba(0, 0, 0, 0.9) transparent transparent transparent;
+    }
+
+    .track-tooltip:hover .track-tooltip-text {
+      visibility: visible;
+      opacity: 1;
+    }
+
+    @keyframes track-pulse {
+      0% { box-shadow: 0 0 0 0 rgba(0, 183, 255, 0.7); }
+      70% { box-shadow: 0 0 0 15px rgba(0, 183, 255, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(0, 183, 255, 0); }
+    }
+
+    .track-card:focus {
+      outline: 4px solid #ffff00;
+      outline-offset: 3px;
+    }
+
+    .track-card.locked:focus {
+      outline: none;
+    }
+
+
+    /* Perfectly centered notifications with backdrop */
+    .notification-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 2000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+    }
+
+    .notification-container::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(2px);
+      z-index: -1;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+
+    .notification-container.show::before {
+      opacity: 1;
+    }
+
+    .notification {
+      background: linear-gradient(135deg, #00b7ff, #0022ff);
+      color: #fff;
+      padding: 30px 40px;
+      border-radius: 20px;
+      box-shadow: 0 15px 50px rgba(0, 183, 255, 0.5);
+      border: 4px solid #00b7ff;
+      font-family: 'Press Start 2P';
+      font-size: 13px;
+      max-width: 800px;
+      min-width: 500px;
+      text-align: center;
+      opacity: 0;
+      transform: scale(0.7) translateY(50px);
+      transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      pointer-events: auto;
+      position: relative;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%) scale(0.7) translateY(50px);
+    }
+
+    .notification.show {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1) translateY(0);
+    }
+
+    .notification.fade-out {
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(0.7) translateY(50px);
+    }
+
+    .notification-icon {
+      font-size: 40px;
+      margin-bottom: 18px;
+      display: block;
+      text-align: center;
+    }
+
+    .notification-title {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 15px;
+      text-align: center;
+      line-height: 1.2;
+    }
+
+    .notification-message {
+      font-size: 12px;
+      line-height: 1.5;
+      opacity: 0.9;
+      margin-bottom: 25px;
+    }
+
+
+    .notification-buttons {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+      margin-top: 20px;
+    }
+
+    .notification-btn {
+      padding: 12px 25px;
+      font-family: 'Press Start 2P';
+      font-size: 10px;
+      border: 2px solid;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-transform: uppercase;
+      min-width: 80px;
+    }
+
+    .notification-btn.confirm {
+      background: rgba(0, 255, 0, 0.2);
+      border-color: #00ff00;
+      color: #00ff00;
+    }
+
+    .notification-btn.confirm:hover {
+      background: rgba(0, 255, 0, 0.3);
+      box-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
+    }
+
+    .notification-btn.cancel {
+      background: rgba(255, 0, 0, 0.2);
+      border-color: #ff0000;
+      color: #ff0000;
+    }
+
+    .notification-btn.cancel:hover {
+      background: rgba(255, 0, 0, 0.3);
+      box-shadow: 0 0 15px rgba(255, 0, 0, 0.5);
+    }
+
+    .notification-close {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 18px;
+      cursor: pointer;
+      opacity: 0.7;
+      transition: opacity 0.3s;
+    }
+
+    .notification-close:hover {
+      opacity: 1;
+    }
+
+    /* Level Completion Overlay Styles */
+    .level-completion-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(5px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 3000;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+
+    .level-completion-overlay.show {
+      opacity: 1;
+    }
+
+    .completion-content {
+      background: linear-gradient(135deg, #00b7ff, #0022ff);
+      border: 4px solid #00b7ff;
+      border-radius: 20px;
+      padding: 40px;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0, 183, 255, 0.5);
+      max-width: 500px;
+      min-width: 400px;
+      transform: scale(0.7);
+      transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    }
+
+    .level-completion-overlay.show .completion-content {
+      transform: scale(1);
+    }
+
+    .completion-icon {
+      font-size: 60px;
+      margin-bottom: 20px;
+      animation: bounce 2s infinite;
+    }
+
+    .completion-title {
+      font-family: 'Press Start 2P';
+      font-size: 24px;
+      color: #fff;
+      margin-bottom: 15px;
+      text-shadow: 2px 2px 0 #000;
+    }
+
+    .completion-message {
+      font-family: 'Press Start 2P';
+      font-size: 12px;
+      color: #fff;
+      margin-bottom: 20px;
+      line-height: 1.4;
+      opacity: 0.9;
+    }
+
+    .completion-progress {
+      font-family: 'Press Start 2P';
+      font-size: 10px;
+      color: #00ff00;
+      margin-bottom: 25px;
+      padding: 10px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      border: 2px solid #00ff00;
+    }
+
+    .completion-buttons {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      margin-top: 25px;
+    }
+
+    .completion-btn {
+      padding: 15px 25px;
+      font-family: 'Press Start 2P';
+      font-size: 10px;
+      border: 3px solid;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      min-width: 120px;
+    }
+
+    .completion-btn.next-level {
+      background: rgba(0, 255, 0, 0.2);
+      border-color: #00ff00;
+      color: #00ff00;
+    }
+
+    .completion-btn.next-level:hover {
+      background: rgba(0, 255, 0, 0.3);
+      box-shadow: 0 0 20px rgba(0, 255, 0, 0.6);
+      transform: translateY(-2px);
+    }
+
+    .completion-btn.main-menu {
+      background: rgba(255, 165, 0, 0.2);
+      border-color: #ffa500;
+      color: #ffa500;
+    }
+
+    .completion-btn.main-menu:hover {
+      background: rgba(255, 165, 0, 0.3);
+      box-shadow: 0 0 20px rgba(255, 165, 0, 0.6);
+      transform: translateY(-2px);
+    }
+
+    @keyframes bounce {
+      0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
+      }
+      40% {
+        transform: translateY(-10px);
+      }
+      60% {
+        transform: translateY(-5px);
+      }
+    }
+
+
+    /* Level Progression Styles */
+    .level-item {
+      display: flex;
+      align-items: center;
+      padding: 10px;
+      border: 3px solid;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      min-height: 10px;
+      font-family: 'Press Start 2P';
+      font-size: 12px;
+    }
+
+    .level-item.locked {
+      border-color: #666;
+      background: rgba(100, 100, 100, 0.3);
+      color: #999;
+      cursor: not-allowed;
+    }
+
+    .level-item.locked:hover {
+      background: rgba(120, 120, 120, 0.4);
+      border-color: #777;
+    }
+
+    .level-item.unlocked {
+      border-color: #00b7ff;
+      background: rgba(0, 183, 255, 0.1);
+      color: #00b7ff;
+      cursor: pointer;
+      animation: pulse 2s infinite;
+    }
+
+    .level-item.unlocked:hover {
+      background: rgba(0, 183, 255, 0.2);
+      border-color: #0022ff;
+      box-shadow: 0 0 20px rgba(0, 183, 255, 0.5);
+    }
+
+    .level-item.completed {
+      border-color: #00ff00;
+      background: rgba(0, 255, 0, 0.1);
+      color: #00ff00;
+    }
+
+    .level-item.completed::after {
+      content: '✓';
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      font-size: 20px;
+      color: #00ff00;
+      text-shadow: 0 0 10px #00ff00;
+    }
+
+    .level-number {
+      font-size: 16px;
+      font-weight: bold;
+      margin-right: 15px;
+      min-width: 60px;
+    }
+
+    .level-status {
+      font-size: 10px;
+      margin-top: 5px;
+      opacity: 0.8;
+    }
+
+    .level-icon {
+      font-size: 24px;
+      margin-right: 15px;
+      min-width: 40px;
+      text-align: center;
+    }
+
+    .level-item.locked .level-icon {
+      color: #666;
+    }
+
+    .level-item.unlocked .level-icon {
+      color: #00b7ff;
+    }
+
+    .level-item.completed .level-icon {
+      color: #00ff00;
+    }
+
+    .tooltip {
+      position: relative;
+    }
+
+    .tooltip .tooltip-text {
+      visibility: hidden;
+      width: 200px;
+      background-color: rgba(0, 0, 0, 0.9);
+      color: #fff;
+      text-align: center;
+      border-radius: 6px;
+      padding: 8px 12px;
+      position: absolute;
+      z-index: 1001;
+      bottom: 125%;
+      left: 50%;
+      margin-left: -100px;
+      font-family: 'Press Start 2P';
+      font-size: 8px;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .tooltip .tooltip-text::after {
+      content: "";
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      margin-left: -5px;
+      border-width: 5px;
+      border-style: solid;
+      border-color: rgba(0, 0, 0, 0.9) transparent transparent transparent;
+    }
+
+    .tooltip:hover .tooltip-text {
+      visibility: visible;
+      opacity: 1;
+    }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(0, 183, 255, 0.7); }
+      70% { box-shadow: 0 0 0 10px rgba(0, 183, 255, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(0, 183, 255, 0); }
+    }
+
+    @keyframes pulse-progress {
+      0% { box-shadow: 0 0 0 0 rgba(255, 170, 0, 0.7); }
+      70% { box-shadow: 0 0 0 10px rgba(255, 170, 0, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(255, 170, 0, 0); }
+    }
+
+    .level-item:focus {
+      outline: 3px solid #ffff00;
+      outline-offset: 2px;
+    }
+
+    .level-item.locked:focus {
+      outline: none;
+    }
+
+    /* Achievement Styles */
+    .achievement-card {
+      padding: 25px;
+      border: 3px solid;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      min-height: 180px;
+      font-family: 'Press Start 2P';
+      font-size: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      opacity: 0.6;
+      filter: grayscale(100%);
+    }
+
+    .achievement-card.locked {
+      border-color: #666;
+      background: rgba(100, 100, 100, 0.3);
+      color: #999;
+      cursor: default;
+    }
+
+    .achievement-card.unlocked {
+      border-color: #ffd700;
+      background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 237, 78, 0.1));
+      color: #ffd700;
+      opacity: 1;
+      filter: grayscale(0%);
+      animation: achievement-glow 3s infinite;
+    }
+
+    .achievement-card.unlocked:hover {
+      background: linear-gradient(135deg, rgba(255, 215, 0, 0.3), rgba(255, 237, 78, 0.2));
+      border-color: #ffed4e;
+      box-shadow: 0 0 30px rgba(255, 215, 0, 0.6);
+      transform: translateY(-5px);
+    }
+
+    .achievement-icon {
+      font-size: 48px;
+      margin-bottom: 15px;
+      filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.5));
+    }
+
+    .achievement-card.locked .achievement-icon {
+      color: #666;
+    }
+
+    .achievement-card.unlocked .achievement-icon {
+      color: #ffd700;
+      animation: icon-bounce 2s infinite;
+    }
+
+    .achievement-title {
+      font-size: 14px;
+      font-weight: bold;
+      margin-bottom: 8px;
+      line-height: 1.2;
+    }
+
+    .achievement-description {
+      font-size: 10px;
+      opacity: 0.8;
+      line-height: 1.3;
+      margin-bottom: 10px;
+    }
+
+    .achievement-unlocked-date {
+      font-size: 8px;
+      opacity: 0.6;
+      margin-top: auto;
+    }
+
+    .achievement-lock-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 9px;
+      font-size: 24px;
+      color: #666;
+    }
+
+    @keyframes achievement-glow {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.4); }
+      50% { box-shadow: 0 0 0 15px rgba(255, 215, 0, 0); }
+    }
+
+    @keyframes icon-bounce {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+
+    .achievement-tooltip {
+      position: relative;
+    }
+
+    .achievement-tooltip .achievement-tooltip-text {
+      visibility: hidden;
+      width: 280px;
+      background-color: rgba(0, 0, 0, 0.9);
+      color: #fff;
+      text-align: center;
+      border-radius: 6px;
+      padding: 10px 15px;
+      position: absolute;
+      z-index: 1001;
+      bottom: 125%;
+      left: 50%;
+      margin-left: -140px;
+      font-family: 'Press Start 2P';
+      font-size: 8px;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .achievement-tooltip .achievement-tooltip-text::after {
+      content: "";
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      margin-left: -5px;
+      border-width: 5px;
+      border-style: solid;
+      border-color: rgba(0, 0, 0, 0.9) transparent transparent transparent;
+    }
+
+    .achievement-tooltip:hover .achievement-tooltip-text {
+      visibility: visible;
+      opacity: 1;
+    }
+
+    /* Debug Button Styles */
+    .debug-button {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+      border: 3px solid #cc4444;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 24px;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+      transition: all 0.3s ease;
+      z-index: 1000;
+      font-family: 'Press Start 2P';
+    }
+
+    .debug-button:hover {
+      background: linear-gradient(135deg, #ff5252, #d84343);
+      box-shadow: 0 6px 20px rgba(255, 107, 107, 0.6);
+      transform: scale(1.1);
+    }
+
+    .debug-button:active {
+      transform: scale(0.95);
+    }
+
+    /* Debug Panel Styles */
+    .debug-panel {
+      position: fixed;
+      bottom: 90px;
+      right: 20px;
+      background: linear-gradient(135deg, #2c3e50, #34495e);
+      border: 3px solid #1a252f;
+      border-radius: 15px;
+      padding: 20px;
+      min-width: 250px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+      display: none;
+      z-index: 999;
+      font-family: 'Press Start 2P';
+      font-size: 10px;
+    }
+
+    .debug-panel.show {
+      display: block;
+      animation: slideUp 0.3s ease;
+    }
+
+    .debug-panel-title {
+      color: #ff6b6b;
+      font-size: 12px;
+      margin-bottom: 15px;
+      text-align: center;
+      text-shadow: 1px 1px 0 #000;
+    }
+
+    .debug-panel-button {
+      width: 100%;
+      padding: 10px 15px;
+      background: rgba(255, 107, 107, 0.2);
+      border: 2px solid #ff6b6b;
+      border-radius: 8px;
+      color: #ff6b6b;
+      cursor: pointer;
+      font-family: 'Press Start 2P';
+      font-size: 8px;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+    }
+
+    .debug-panel-button:hover {
+      background: rgba(255, 107, 107, 0.3);
+      box-shadow: 0 0 15px rgba(255, 107, 107, 0.5);
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Screen Reader Announcement Panel Styles */
+    .screen-reader-panel {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(135deg, #1a1a2e, #16213e);
+      border: 4px solid #00b7ff;
+      border-radius: 15px;
+      padding: 20px;
+      min-width: 400px;
+      max-width: 600px;
+      box-shadow: 0 8px 25px rgba(0, 183, 255, 0.5);
+      display: none;
+      z-index: 1500;
+      font-family: 'Press Start 2P';
+      text-align: center;
+      opacity: 0;
+      transform: translateX(-50%) translateY(-20px);
+      transition: all 0.5s ease;
+    }
+
+    .screen-reader-panel.show {
+      display: block;
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+      animation: panel-appear 0.5s ease;
+    }
+
+    .screen-reader-icon {
+      font-size: 32px;
+      margin-bottom: 10px;
+      animation: icon-pulse 2s infinite;
+    }
+
+    .screen-reader-title {
+      color: #00b7ff;
+      font-size: 10px;
+      margin-bottom: 15px;
+      text-shadow: 2px 2px 0 #000;
+      letter-spacing: 1px;
+    }
+
+    .screen-reader-message {
+      color: #fff;
+      font-size: 8px;
+      line-height: 1.4;
+      min-height: 40px;
+      border-left: 3px solid #00b7ff;
+      padding-left: 15px;
+      text-align: left;
+      overflow: hidden;
+    }
+
+    @keyframes panel-appear {
+      0% {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-20px) scale(0.9);
+      }
+      50% {
+        opacity: 0.7;
+        transform: translateX(-50%) translateY(-10px) scale(1.02);
+      }
+      100% {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0) scale(1);
+      }
+    }
+
+    @keyframes icon-pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+
+    @media (max-width: 768px) {
+    .track-card {
+      padding: 20px;
+      font-size: 12px;
+      min-height: 150px;
+    }
+
+    .track-icon {
+      font-size: 36px;
+      margin-bottom: 15px;
+    }
+
+    .track-title {
+      font-size: 16px;
+    }
+
+    .track-tooltip .track-tooltip-text {
+      width: 200px;
+      margin-left: -100px;
+      font-size: 7px;
+    }
+
+    .level-item {
+      padding: 15px;
+      font-size: 10px;
+      min-height: 70px;
+    }
+
+    .level-number {
+      font-size: 14px;
+      min-width: 50px;
+    }
+
+    .level-icon {
+      font-size: 20px;
+      min-width: 35px;
+    }
+
+    .tooltip .tooltip-text {
+      width: 180px;
+      margin-left: -90px;
+      font-size: 7px;
+    }
+
+    .debug-button {
+      width: 50px;
+      height: 50px;
+      font-size: 18px;
+      bottom: 15px;
+      right: 15px;
+    }
+
+    .debug-panel {
+      bottom: 75px;
+      right: 15px;
+      min-width: 200px;
+      padding: 15px;
+    }
+  }
+
+  /* iPhone 14 Pro Max and similar small screens */
+  @media (max-width: 480px) {
+    .track-card {
+      padding: 15px;
+      font-size: 10px;
+      min-height: 120px;
+    }
+
+    .track-icon {
+      font-size: 28px;
+      margin-bottom: 10px;
+    }
+
+    .track-title {
+      font-size: 12px;
+    }
+
+    .track-status {
+      font-size: 9px;
+    }
+
+    .track-tooltip .track-tooltip-text {
+      width: 160px;
+      margin-left: -80px;
+      font-size: 6px;
+      padding: 6px 10px;
+    }
+
+    .level-item {
+      padding: 10px;
+      font-size: 8px;
+      min-height: 55px;
+    }
+
+    .level-number {
+      font-size: 11px;
+      min-width: 35px;
+      margin-right: 8px;
+    }
+
+    .level-icon {
+      font-size: 16px;
+      min-width: 25px;
+      margin-right: 8px;
+    }
+
+    .level-status {
+      font-size: 7px;
+    }
+
+    .tooltip .tooltip-text {
+      width: 140px;
+      margin-left: -70px;
+      font-size: 6px;
+      padding: 5px 8px;
+    }
+
+    .level-item.completed::after {
+      top: 5px;
+      right: 8px;
+      font-size: 14px;
+    }
+
+    .debug-button {
+      width: 45px;
+      height: 45px;
+      font-size: 16px;
+      bottom: 80px;
+      right: 10px;
+    }
+
+    .debug-panel {
+      bottom: 135px;
+      right: 10px;
+      min-width: 180px;
+      padding: 12px;
+    }
+  }
+
+  /* iPhone 14 Pro Max specific (430px width) */
+  @media (max-width: 440px) {
+    /* Header and titles */
+    .track-selection-container h1 {
+      font-size: 12px !important;
+      padding: 0 10px;
+    }
+
+    #current-track-title {
+      font-size: 12px !important;
+    }
+
+    #back-to-tracks {
+      padding: 6px 10px;
+      font-size: 8px;
+    }
+
+    .achievements-section h1 {
+      font-size: 12px !important;
+    }
+
+    .track-card {
+      padding: 12px;
+      font-size: 9px;
+      min-height: 100px;
+    }
+
+    .track-icon {
+      font-size: 24px;
+      margin-bottom: 8px;
+    }
+
+    .track-title {
+      font-size: 11px;
+    }
+
+    .track-status {
+      font-size: 8px;
+    }
+
+    .track-tooltip .track-tooltip-text {
+      width: 150px;
+      margin-left: -75px;
+      font-size: 6px;
+      padding: 5px 8px;
+    }
+
+    .level-item {
+      padding: 6px;
+      font-size: 6px;
+      min-height: 40px;
+    }
+
+    .level-number {
+      font-size: 9px;
+      min-width: 25px;
+      margin-right: 4px;
+    }
+
+    .level-icon {
+      font-size: 12px;
+      min-width: 18px;
+      margin-right: 4px;
+    }
+
+    .level-status {
+      font-size: 5px;
+    }
+
+    .tooltip .tooltip-text {
+      width: 120px;
+      margin-left: -60px;
+      font-size: 5px;
+      padding: 3px 5px;
+    }
+
+    .level-item.completed::after {
+      top: 3px;
+      right: 4px;
+      font-size: 10px;
+    }
+
+    .achievement-card {
+      padding: 12px;
+      font-size: 7px;
+      min-height: 100px;
+    }
+
+    .achievement-icon {
+      font-size: 28px;
+    }
+
+    .achievement-title {
+      font-size: 9px;
+    }
+
+    .achievement-description {
+      font-size: 6px;
+    }
+
+    /* Grid layouts */
+    #tracks-grid {
+      gap: 10px;
+      padding: 8px;
+    }
+
+    #levels-grid {
+      gap: 6px;
+      padding: 6px;
+    }
+
+    #achievements-grid {
+      gap: 10px;
+      padding: 8px;
+    }
+
+    /* Main menu button */
+    #main-menu-btn {
+      padding: 8px 14px;
+      font-size: 8px;
+      bottom: 12px;
+    }
+  }
+
+  /* Very small screens (iPhone SE, small Android) */
+  @media (max-width: 360px) {
+    .level-item {
+      padding: 4px;
+      font-size: 5px;
+      min-height: 32px;
+    }
+
+    .level-number {
+      font-size: 7px;
+      min-width: 18px;
+      margin-right: 2px;
+    }
+
+    .level-icon {
+      font-size: 9px;
+      min-width: 14px;
+      margin-right: 2px;
+    }
+
+    .level-status {
+      font-size: 4px;
+    }
+
+    .level-item.completed::after {
+      top: 2px;
+      right: 2px;
+      font-size: 7px;
+    }
+
+    #levels-grid {
+      gap: 4px;
+      padding: 4px;
+    }
+  }
+
+  /* Extremely small screens */
+  @media (max-width: 320px) {
+    .level-item {
+      padding: 3px;
+      font-size: 4px;
+      min-height: 28px;
+    }
+
+    .level-number {
+      font-size: 6px;
+      min-width: 15px;
+      margin-right: 2px;
+    }
+
+    .level-icon {
+      font-size: 8px;
+      min-width: 12px;
+      margin-right: 2px;
+    }
+
+    .level-status {
+      font-size: 3px;
+    }
+
+    .level-item.completed::after {
+      top: 1px;
+      right: 2px;
+      font-size: 6px;
+    }
+
+    #levels-grid {
+      gap: 3px;
+      padding: 3px;
+    }
+  }
+  </style>
+</head>
+<body>
+
+  <!-- Main Menu Button -->
+  <button id="main-menu-btn" onclick="window.location.href='index.html'" style="position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); padding: 15px 30px; font-family: 'Press Start 2P'; font-size: 12px; background: rgba(0, 0, 0, 0.8); color: #00b7ff; border: 2px solid #00b7ff; border-radius: 8px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 0 15px rgba(0, 183, 255, 0.3); z-index: 1000;">🏠 Main Menu</button>
+
+  <!-- Track Selection Container -->
+  <div id="track-selection-container" style="display: none;">
+    <h1 style="font-family: 'Press Start 2P'; font-size: 24px; text-align: center; margin-bottom: 40px; color: #00b7ff; text-shadow: 2px 2px 0 #000;">Escape the Disaster - Choose Your Track</h1>
+
+    <div id="tracks-grid" style="display: grid; gap: 20px; max-width: 900px; margin: 0 auto; padding: 15px; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));">
+      <!-- Track cards will be dynamically generated here -->
+    </div>
+
+  </div>
+
+  <!-- Notification Container -->
+  <div class="notification-container" id="notification-container"></div>
+
+  <!-- Level Completion Overlay -->
+  <div id="level-completion-overlay" class="level-completion-overlay" style="display: none;">
+    <div class="completion-content">
+      <div class="completion-icon" id="completion-icon">🎉</div>
+      <h2 id="completion-title">Level Complete!</h2>
+      <p id="completion-message">Congratulations! You have successfully completed this level.</p>
+      <div class="completion-buttons">
+        <button id="next-level-btn" class="completion-btn next-level">Next Level</button>
+        <button id="main-menu-btn" class="completion-btn main-menu">Main Menu</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Level Progression Container -->
+  <div id="level-progression-container" style="display: none;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+      <h1 id="current-track-title" style="font-family: 'Press Start 2P'; font-size: 24px; color: #00b7ff; text-shadow: 2px 2px 0 #000; margin: 0;">Earthquake Track</h1>
+      <div style="display: flex; gap: 15px; align-items: center;">
+        <button id="back-to-tracks" style="padding: 10px 20px; font-family: 'Press Start 2P'; font-size: 10px; background: rgba(0, 0, 0, 0.6); color: #00b7ff; border: 2px solid #00b7ff; border-radius: 4px; cursor: pointer;">← Back to Tracks</button>
+      </div>
+    </div>
+
+    <div id="levels-grid" style="display: grid; gap: 15px; max-width: 800px; margin: 0 auto; padding: 15px;">
+      <!-- Levels will be dynamically generated here -->
+    </div>
+  </div>
+
+  <!-- Achievements Section -->
+  <div id="achievements-section" style="display: none;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+      <h1 style="font-family: 'Press Start 2P'; font-size: 24px; color: #ffd700; text-shadow: 2px 2px 0 #000; margin: 0;">🏆 Achievements</h1>
+      <button id="back-from-achievements" style="padding: 10px 20px; font-family: 'Press Start 2P'; font-size: 10px; background: rgba(0, 0, 0, 0.6); color: #ffd700; border: 2px solid #ffd700; border-radius: 4px; cursor: pointer;">← Back</button>
+    </div>
+
+    <div style="text-align: center; margin-bottom: 30px;">
+      <button id="reset-stuck-levels" style="margin-top: 15px; padding: 8px 15px; font-family: 'Press Start 2P'; font-size: 8px; background: rgba(255, 0, 0, 0.2); color: #ff0000; border: 2px solid #ff0000; border-radius: 4px; cursor: pointer;">🔧 Reset Stuck Levels</button>
+    </div>
+
+    <div id="achievements-grid" style="display: grid; gap: 20px; max-width: 900px; margin: 0 auto; padding: 15px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+      <!-- Achievement cards will be dynamically generated here -->
+    </div>
+  </div>
+
+
+
+  <div id="debug-panel" class="debug-panel">
+    <div class="debug-panel-title">Debug Tools</div>
+    <button id="reset-stuck-levels-debug" class="debug-panel-button">🔧 Reset Stuck Levels</button>
+  </div>
+
+  <script>
+    // Track-Based Level Progression System
+    class TrackProgression {
+      constructor() {
+        this.tracks = ['Earthquake', 'Fire'];
+        this.levelsCount = 4;
+        this.tracksContainer = document.getElementById('tracks-grid');
+        this.levelsContainer = document.getElementById('levels-grid');
+        this.achievementsContainer = document.getElementById('achievements-grid');
+        this.trackSelectionContainer = document.getElementById('track-selection-container');
+        this.levelProgressionContainer = document.getElementById('level-progression-container');
+        this.achievementsSection = document.getElementById('achievements-section');
+        this.mainMenuBtn = document.getElementById('main-menu-btn');
+        this.currentTrackTitle = document.getElementById('current-track-title');
+        this.backToTracksBtn = document.getElementById('back-to-tracks');
+        this.toggleAchievementsBtn = document.getElementById('toggle-achievements');
+        this.backFromAchievementsBtn = document.getElementById('back-from-achievements');
+
+        // Level completion overlay elements
+        this.levelCompletionOverlay = document.getElementById('level-completion-overlay');
+        this.completionIcon = document.getElementById('completion-icon');
+        this.completionTitle = document.getElementById('completion-title');
+        this.completionMessage = document.getElementById('completion-message');
+        this.completionProgress = document.getElementById('completion-progress');
+        this.nextLevelBtn = document.getElementById('next-level-btn');
+        this.mainMenuBtn = document.getElementById('main-menu-btn');
+
+        this.trackStates = this.loadTrackProgress();
+        this.achievementStates = this.loadAchievementProgress();
+        this.currentTrack = null;
+
+        // Notification queue system
+        this.notificationQueue = [];
+        this.isProcessingQueue = false;
+
+        this.init();
+      }
+
+      // Initialize the track progression system
+      init() {
+        this.createTrackCards();
+        this.createAchievementCards();
+        this.updateTrackCardsDisplay();
+        this.updateAchievementCardsDisplay();
+        this.showTrackSelection();
+
+        // Set up event listeners
+        this.backToTracksBtn.addEventListener('click', () => this.showTrackSelection());
+        this.toggleAchievementsBtn.addEventListener('click', () => this.showAchievements());
+        this.backFromAchievementsBtn.addEventListener('click', () => this.showLevelProgression(this.currentTrack));
+
+        // Debug button and panel functionality
+        const debugButton = document.getElementById('debug-button');
+        const debugPanel = document.getElementById('debug-panel');
+        const resetStuckBtn = document.getElementById('reset-stuck-levels-debug');
+
+        if (debugButton && debugPanel) {
+          debugButton.addEventListener('click', () => {
+            debugPanel.classList.toggle('show');
+          });
+
+          // Close debug panel when clicking outside
+          document.addEventListener('click', (e) => {
+            if (!debugButton.contains(e.target) && !debugPanel.contains(e.target)) {
+              debugPanel.classList.remove('show');
+            }
+          });
+        }
+
+        // Reset stuck levels button in debug panel
+        if (resetStuckBtn) {
+          resetStuckBtn.addEventListener('click', () => {
+            if (confirm('Reset all stuck levels to unlocked status? This will fix any levels stuck in "in progress" state.')) {
+              this.resetStuckLevels();
+              alert('Stuck levels have been reset! You can now access them again.');
+              debugPanel.classList.remove('show'); // Close panel after action
+            }
+          });
+        }
+
+        // Set up keyboard navigation
+        this.setupKeyboardNavigation();
+
+      }
+
+      // Load progress from localStorage or create initial state
+      loadTrackProgress() {
+        const saved = localStorage.getItem('escape-the-disaster-track-progress');
+        if (saved) {
+          return JSON.parse(saved);
+        }
+
+        // Initial state
+        return {
+          Earthquake: {
+            1: 'unlocked',
+            2: 'locked',
+            3: 'locked',
+            4: 'locked',
+            5: 'locked'
+          },
+          Fire: {
+            isUnlocked: false,
+            levels: {
+              1: 'locked',
+              2: 'locked',
+              3: 'locked',
+              4: 'locked',
+              5: 'locked'
+            }
+          }
+        };
+      }
+
+      // Load achievement progress from localStorage or create initial state
+      loadAchievementProgress() {
+        const saved = localStorage.getItem('escape-the-disaster-achievements');
+        if (saved) {
+          return JSON.parse(saved);
+        }
+
+        // Initial achievement state
+        return {
+          'the-survivalist': {
+            id: 'the-survivalist',
+            title: 'The Survivalist',
+            description: 'Complete all 4 levels in the Fire Track',
+            icon: '🏆',
+            unlocked: false,
+            unlockedDate: null
+          }
+        };
+      }
+
+      // Save achievement progress to localStorage
+      saveAchievementProgress() {
+        localStorage.setItem('escape-the-disaster-achievements', JSON.stringify(this.achievementStates));
+      }
+
+      // Save progress to localStorage
+      saveTrackProgress() {
+        localStorage.setItem('escape-the-disaster-track-progress', JSON.stringify(this.trackStates));
+      }
+
+      // Create track card HTML elements
+      createTrackCards() {
+        this.tracksContainer.innerHTML = '';
+
+        this.tracks.forEach(track => {
+          const trackCard = document.createElement('div');
+          trackCard.className = `track-card ${this.isTrackUnlocked(track) ? 'unlocked' : 'locked'}`;
+          trackCard.id = `track-${track}`;
+          trackCard.tabIndex = this.isTrackUnlocked(track) ? 0 : -1;
+
+          // Add ARIA attributes
+          trackCard.setAttribute('role', 'button');
+          trackCard.setAttribute('aria-label', `${track} Track, Status: ${this.isTrackUnlocked(track) ? 'Unlocked' : 'Locked - finish Earthquake to unlock Fire'}`);
+
+          const trackIcon = track === 'Earthquake' ? '🌋' : '🔥';
+          const isUnlocked = this.isTrackUnlocked(track);
+
+          if (!isUnlocked) {
+            trackCard.classList.add('track-tooltip');
+            trackCard.innerHTML = `
+              <div class="track-icon">🔒</div>
+              <div class="track-title">${track} Track</div>
+              <div class="track-status">LOCKED</div>
+              <div class="track-tooltip-text">Locked — finish Earthquake to unlock Fire</div>
+            `;
+          } else {
+            trackCard.innerHTML = `
+              <div class="track-icon">${trackIcon}</div>
+              <div class="track-title">${track} Track</div>
+              <div class="track-status">UNLOCKED</div>
+            `;
+          }
+
+          // Add click event listener
+          trackCard.addEventListener('click', () => this.handleTrackClick(track));
+
+          // Add keyboard event listener
+          trackCard.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              this.handleTrackClick(track);
+            }
+          });
+
+          this.tracksContainer.appendChild(trackCard);
+        });
+      }
+
+      // Check if a track is unlocked
+      isTrackUnlocked(track) {
+        if (track === 'Earthquake') return true;
+        if (track === 'Fire') {
+          // Fire is unlocked only if all Earthquake levels are unlocked or completed
+          const earthquakeLevels = this.trackStates.Earthquake;
+          return Object.values(earthquakeLevels).every(state => state === 'unlocked' || state === 'completed');
+        }
+        return false;
+      }
+
+      // Update track cards display
+      updateTrackCardsDisplay() {
+        this.tracks.forEach(track => {
+          const trackCard = document.getElementById(`track-${track}`);
+          if (trackCard) {
+            const isUnlocked = this.isTrackUnlocked(track);
+            trackCard.className = `track-card ${isUnlocked ? 'unlocked' : 'locked'}`;
+            trackCard.tabIndex = isUnlocked ? 0 : -1;
+            trackCard.setAttribute('aria-label', `${track} Track, Status: ${isUnlocked ? 'Unlocked' : 'Locked - finish Earthquake to unlock Fire'}`);
+          }
+        });
+      }
+
+      // Handle track click
+      handleTrackClick(track) {
+        if (!this.isTrackUnlocked(track)) {
+          this.announceToScreenReader(`Fire track is locked. Please complete all Earthquake levels first.`);
+          return;
+        }
+
+        this.currentTrack = track;
+        this.showLevelProgression(track);
+        this.announceToScreenReader(`Selected ${track} track. Level 1 is unlocked.`);
+      }
+
+      // Show level progression for selected track
+      showLevelProgression(track) {
+        this.trackSelectionContainer.style.display = 'none';
+        this.achievementsSection.style.display = 'none';
+        this.levelProgressionContainer.style.display = 'block';
+        this.mainMenuBtn.style.display = 'none';
+        this.currentTrackTitle.textContent = `${track} Track`;
+
+        this.createLevels(track);
+        this.updateLevelsDisplay(track);
+      }
+
+      // Show track selection screen
+      showTrackSelection() {
+        this.levelProgressionContainer.style.display = 'none';
+        this.achievementsSection.style.display = 'none';
+        this.trackSelectionContainer.style.display = 'block';
+        this.mainMenuBtn.style.display = 'block';
+        this.currentTrack = null;
+        this.updateTrackCardsDisplay();
+      }
+
+      // Show achievements section
+      showAchievements() {
+        this.trackSelectionContainer.style.display = 'none';
+        this.levelProgressionContainer.style.display = 'none';
+        this.achievementsSection.style.display = 'block';
+        this.mainMenuBtn.style.display = 'none';
+        this.updateAchievementCardsDisplay();
+        this.announceToScreenReader(`Achievements section opened. ${this.getUnlockedAchievementCount()} of ${Object.keys(this.achievementStates).length} achievements unlocked.`);
+      }
+
+      // Create achievement card HTML elements
+      createAchievementCards() {
+        this.achievementsContainer.innerHTML = '';
+
+        Object.values(this.achievementStates).forEach(achievement => {
+          const achievementCard = document.createElement('div');
+          achievementCard.className = `achievement-card ${achievement.unlocked ? 'unlocked' : 'locked'}`;
+          achievementCard.id = `achievement-${achievement.id}`;
+
+          // Add ARIA attributes
+          achievementCard.setAttribute('role', 'button');
+          achievementCard.setAttribute('aria-label', `${achievement.title} Achievement, Status: ${achievement.unlocked ? 'Unlocked' : 'Locked'}`);
+
+          const unlockedDate = achievement.unlockedDate ? new Date(achievement.unlockedDate).toLocaleDateString() : '';
+
+          achievementCard.innerHTML = `
+            <div class="achievement-icon">${achievement.icon}</div>
+            <div class="achievement-title">${achievement.title}</div>
+            <div class="achievement-description">${achievement.description}</div>
+            ${achievement.unlocked ? `<div class="achievement-unlocked-date">Unlocked: ${unlockedDate}</div>` : '<div class="achievement-lock-overlay">🔒</div>'}
+          `;
+
+
+          this.achievementsContainer.appendChild(achievementCard);
+        });
+      }
+
+      // Update achievement cards display
+      updateAchievementCardsDisplay() {
+        Object.values(this.achievementStates).forEach(achievement => {
+          const achievementCard = document.getElementById(`achievement-${achievement.id}`);
+          if (achievementCard) {
+            achievementCard.className = `achievement-card ${achievement.unlocked ? 'unlocked' : 'locked'}`;
+            achievementCard.setAttribute('aria-label', `${achievement.title} Achievement, Status: ${achievement.unlocked ? 'Unlocked' : 'Locked'}`);
+          }
+        });
+
+      }
+
+      // Get count of unlocked achievements
+      getUnlockedAchievementCount() {
+        return Object.values(this.achievementStates).filter(achievement => achievement.unlocked).length;
+      }
+
+      // Create level HTML elements for a track
+      createLevels(track) {
+        this.levelsContainer.innerHTML = '';
+
+        for (let i = 1; i <= this.levelsCount; i++) {
+          const levelItem = document.createElement('div');
+          levelItem.className = `level-item ${this.trackStates[track][i] || this.trackStates[track].levels[i]}`;
+          levelItem.id = `${track}-level-${i}`;
+          levelItem.tabIndex = (this.trackStates[track][i] || this.trackStates[track].levels[i]) === 'locked' ? -1 : 0;
+
+          // Add ARIA attributes
+          levelItem.setAttribute('role', 'button');
+          levelItem.setAttribute('aria-label', `Level ${i}, Status: ${(this.trackStates[track][i] || this.trackStates[track].levels[i]).replace('_', ' ')}`);
+
+          // Add tooltip for locked levels
+          const currentState = this.trackStates[track][i] || this.trackStates[track].levels[i];
+          if (currentState === 'locked') {
+            levelItem.classList.add('tooltip');
+            levelItem.innerHTML = `
+              <div class="level-icon">🔒</div>
+              <div class="level-content">
+                <div class="level-number">Level ${i}</div>
+                <div class="level-status">${currentState.replace('_', ' ').toUpperCase()}</div>
+              </div>
+              <div class="tooltip-text">Locked — finish previous level</div>
+            `;
+          } else {
+            levelItem.innerHTML = `
+              <div class="level-icon">${this.getLevelIcon(i)}</div>
+              <div class="level-content">
+                <div class="level-number">Level ${i}</div>
+                <div class="level-status">${currentState.replace('_', ' ').toUpperCase()}</div>
+              </div>
+            `;
+          }
+
+          // Add click event listener
+          levelItem.addEventListener('click', () => this.handleLevelClick(track, i));
+
+          // Add keyboard event listener
+          levelItem.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              this.handleLevelClick(track, i);
+            }
+          });
+
+          this.levelsContainer.appendChild(levelItem);
+        }
+      }
+
+      // Get appropriate icon for each level
+      getLevelIcon(level) {
+        const icons = {
+          1: '🌪️',
+          2: '🌊',
+          3: '🔥',
+          4: '🌋',
+          5: '⚡'
+        };
+        return icons[level] || '🎯';
+      }
+
+      // Update level display for a track
+      updateLevelsDisplay(track) {
+        for (let i = 1; i <= this.levelsCount; i++) {
+          const levelItem = document.getElementById(`${track}-level-${i}`);
+          if (levelItem) {
+            const currentState = this.trackStates[track][i] || this.trackStates[track].levels[i];
+            levelItem.className = `level-item ${currentState}`;
+            levelItem.tabIndex = currentState === 'locked' ? -1 : 0;
+            levelItem.setAttribute('aria-label', `Level ${i}, Status: ${currentState.replace('_', ' ')}`);
+          }
+        }
+      }
+
+      // Handle level click
+      handleLevelClick(track, level) {
+        const currentState = this.trackStates[track][level] || this.trackStates[track].levels[level];
+
+        if (currentState === 'locked') {
+          this.announceToScreenReader(`Level ${level} is locked. Please complete level ${level - 1} first.`);
+          return;
+        }
+
+        // Navigate to Earthquake Level 1 (1e.html)
+
+        // Handle level navigation - go directly to level file
+        if (currentState === 'unlocked' || currentState === 'completed') {
+          // Navigate directly to the appropriate level file
+          let levelFile;
+          if (track === 'Earthquake') {
+            levelFile = `${level}e.html`;
+          } else if (track === 'Fire') {
+            levelFile = `${level}f.html`;
+          }
+
+          // Navigate immediately to level file
+          window.location.href = levelFile;
+        }
+      }
+
+      // Complete a level and unlock the next
+      completeLevel(track, level) {
+        // First, ensure the level state is properly set to completed
+        this.setLevelState(track, level, 'completed');
+
+        // Check for achievements before other logic
+        this.checkForAchievements(track, level);
+
+        // Check if this completion unlocks Fire track (for any Earthquake level completion)
+        if (track === 'Earthquake') {
+          this.checkAndUnlockFireTrack();
+        }
+
+        // Show level completion overlay
+        this.showLevelCompletionOverlay(track, level);
+
+        // Save progress and update displays
+        this.saveTrackProgress();
+        this.saveAchievementProgress();
+        this.updateLevelsDisplay(track);
+        this.updateTrackCardsDisplay();
+        this.updateAchievementCardsDisplay();
+      }
+
+      // Global function for level files to call when they complete
+      markLevelCompleted(track, level) {
+        // Ensure we have the correct track context
+        if (!this.currentTrack) {
+          this.currentTrack = track;
+        }
+
+        // Ensure the track exists in our state
+        if (!this.trackStates[track]) {
+          return;
+        }
+
+        // Complete the level and update state
+        this.completeLevel(track, level);
+      }
+
+      // Check for achievements that should be unlocked
+      checkForAchievements(track, level) {
+        // Check for "The Survivalist" achievement (complete all Fire levels)
+        if (track === 'Fire' && level === 4) {
+          const allFireLevelsCompleted = Object.values(this.trackStates.Fire.levels).every(state => state === 'completed');
+          if (allFireLevelsCompleted && !this.achievementStates['the-survivalist'].unlocked) {
+            this.unlockAchievement('the-survivalist');
+          }
+        }
+      }
+
+      // Unlock a specific achievement
+      unlockAchievement(achievementId) {
+        const achievement = this.achievementStates[achievementId];
+        if (achievement && !achievement.unlocked) {
+          achievement.unlocked = true;
+          achievement.unlockedDate = new Date().toISOString();
+
+          this.announceToScreenReader(`Achievement unlocked: ${achievement.title}! ${achievement.description}`);
+
+          // Show achievement unlock notification
+          this.showNotification(
+            achievement.icon,
+            '🏆 Achievement Unlocked!',
+            `"${achievement.title}" - ${achievement.description}`,
+            'ACHIEVEMENT EARNED',
+            '',
+            true // isAchievement flag
+          );
+
+          this.saveAchievementProgress();
+        }
+      }
+
+      // Check if Fire track should be unlocked (only when Level 5 is completed)
+      checkAndUnlockFireTrack() {
+        const level4State = this.trackStates.Earthquake[4];
+
+        if (level4State === 'completed' && !this.trackStates.Fire.isUnlocked) {
+          this.trackStates.Fire.isUnlocked = true;
+          // Unlock Level 1 in Fire track when track becomes available
+          this.trackStates.Fire.levels[1] = 'unlocked';
+          this.announceToScreenReader(`Earthquake Level 4 completed! Fire track is now unlocked with Level 1 available.`);
+
+          // Show level completion overlay for Fire track unlock
+          this.showLevelCompletionOverlay('Earthquake', 5);
+        }
+      }
+
+
+      // Show notification for milestones with confirm/cancel
+      showNotification(icon, title, message, progress = '', levelFile = '') {
+        // Add to notification queue
+        this.notificationQueue.push({
+          icon,
+          title,
+          message,
+          progress,
+          levelFile
+        });
+
+        // Process queue if not already processing
+        if (!this.isProcessingQueue) {
+          this.processNotificationQueue();
+        }
+      }
+
+      // Process notification queue (show one at a time)
+      async processNotificationQueue() {
+        if (this.isProcessingQueue || this.notificationQueue.length === 0) return;
+
+        this.isProcessingQueue = true;
+
+        while (this.notificationQueue.length > 0) {
+          const notificationData = this.notificationQueue.shift();
+          await this.displayNotification(notificationData);
+        }
+
+        this.isProcessingQueue = false;
+      }
+
+      // Display a single notification
+      displayNotification({ icon, title, message, progress, levelFile, isAchievement = false }) {
+        return new Promise((resolve) => {
+          const notification = document.createElement('div');
+          notification.className = `notification ${isAchievement ? 'achievement-notification' : ''}`;
+
+          notification.innerHTML = `
+            <button class="notification-close" onclick="this.parentElement.classList.add('fade-out'); setTimeout(() => { this.parentElement.remove(); }, 400);">×</button>
+            <div class="notification-icon">${icon}</div>
+            <div class="notification-title">${title}</div>
+            <div class="notification-message">${message}</div>
+          `;
+
+          const container = document.getElementById('notification-container');
+          container.appendChild(notification);
+
+          // Add show class to container for backdrop
+          container.classList.add('show');
+
+          // Trigger animation after a brief delay
+          setTimeout(() => {
+            notification.classList.add('show');
+          }, 100);
+
+          // Auto remove after 8 seconds
+          setTimeout(() => {
+            if (notification.parentElement) {
+              notification.classList.add('fade-out');
+              setTimeout(() => {
+                notification.remove();
+                container.classList.remove('show');
+                resolve();
+              }, 400);
+            }
+          }, 8000);
+
+          // Manual close handler
+          const closeBtn = notification.querySelector('.notification-close');
+          if (closeBtn) {
+            closeBtn.onclick = () => {
+              notification.classList.add('fade-out');
+              setTimeout(() => {
+                notification.remove();
+                container.classList.remove('show');
+                resolve();
+              }, 400);
+            };
+          }
+        });
+      }
+
+      // Set level state and update everything
+      setLevelState(track, level, state) {
+        // Only restrict Fire track levels when Fire track is not unlocked (except for initial unlock)
+        if (track === 'Fire' && !this.trackStates.Fire.isUnlocked && !(level === 1 && state === 'unlocked')) {
+          return;
+        }
+
+        // Update the state using the appropriate structure
+        if (this.trackStates[track] && this.trackStates[track][level] !== undefined) {
+          this.trackStates[track][level] = state;
+        } else if (this.trackStates[track] && this.trackStates[track].levels) {
+          this.trackStates[track].levels[level] = state;
+        }
+
+        // Immediately save and update displays to ensure state is persisted
+        this.saveTrackProgress();
+        this.updateLevelsDisplay(track);
+        this.updateTrackCardsDisplay();
+      }
+
+      // Set up keyboard navigation
+      setupKeyboardNavigation() {
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Tab') {
+            this.handleTabNavigation(e);
+          }
+          if (e.key === 'Escape' && this.currentTrack) {
+            this.showTrackSelection();
+          }
+        });
+      }
+
+      // Handle tab navigation between levels
+      handleTabNavigation(e) {
+        if (!this.currentTrack) {
+          // Track selection navigation
+          const focusableTracks = Array.from(document.querySelectorAll('.track-card:not(.locked)'));
+          const currentIndex = focusableTracks.indexOf(document.activeElement);
+
+          if (e.shiftKey) {
+            if (currentIndex > 0) {
+              e.preventDefault();
+              focusableTracks[currentIndex - 1].focus();
+            }
+          } else {
+            if (currentIndex < focusableTracks.length - 1) {
+              e.preventDefault();
+              focusableTracks[currentIndex + 1].focus();
+            }
+          }
+        } else {
+          // Level navigation
+          const focusableLevels = Array.from(document.querySelectorAll('.level-item:not(.locked)'));
+          const currentIndex = focusableLevels.indexOf(document.activeElement);
+
+          if (e.shiftKey) {
+            if (currentIndex > 0) {
+              e.preventDefault();
+              focusableLevels[currentIndex - 1].focus();
+            }
+          } else {
+            if (currentIndex < focusableLevels.length - 1) {
+              e.preventDefault();
+              focusableLevels[currentIndex + 1].focus();
+            }
+          }
+        }
+      }
+
+      // Show level completion overlay
+      showLevelCompletionOverlay(track, level) {
+        const levelIcon = this.getLevelIcon(level);
+        const isFinalLevel = level >= this.levelsCount;
+        const completedLevels = this.getCompletedLevelsCount(track);
+        const totalLevels = this.levelsCount;
+        const progressPercentage = Math.round((completedLevels / totalLevels) * 100);
+
+        // Special case: Check if this is Earthquake Level 5 and Fire track is unlocked
+        const isEarthquakeLevel4 = (track === 'Earthquake' && level === 4);
+        const fireTrackUnlocked = isEarthquakeLevel4 && this.trackStates.Fire.isUnlocked;
+
+        // Update overlay content
+        if (fireTrackUnlocked) {
+          // Special case for Fire track unlock
+          this.completionIcon.textContent = '🔥';
+          this.completionTitle.textContent = 'Fire Track Unlocked!';
+          this.completionMessage.textContent = 'Congratulations! You have unlocked the Fire track by completing all Earthquake levels. Ready to start the first Fire level?';
+          this.completionProgress.textContent = `Earthquake Track: 5/5 (100%) • Fire Track: UNLOCKED`;
+        } else {
+          // Normal level completion
+          this.completionIcon.textContent = isFinalLevel ? '🏆' : levelIcon;
+          this.completionTitle.textContent = isFinalLevel ? `${track} Track Complete!` : `Level ${level} Complete!`;
+          this.completionMessage.textContent = isFinalLevel
+            ? `Amazing! You have completed all ${this.levelsCount} levels in the ${track} track!`
+            : `Excellent work! Level ${level} is complete and marked as finished.`;
+        }
+
+        // Show/hide Next Level button based on whether there's a next level
+        if (isFinalLevel && !fireTrackUnlocked) {
+          // Truly final level with no next content
+          this.nextLevelBtn.style.display = 'none';
+          this.mainMenuBtn.textContent = 'Main Menu';
+          this.mainMenuBtn.focus();
+        } else {
+          this.nextLevelBtn.style.display = 'inline-block';
+
+          if (fireTrackUnlocked) {
+            this.nextLevelBtn.textContent = 'Start Fire Level 1';
+          } else {
+            this.nextLevelBtn.textContent = `Next Level (${level + 1})`;
+          }
+
+          // Set up Next Level button
+          this.nextLevelBtn.onclick = () => {
+            this.hideLevelCompletionOverlay();
+            if (fireTrackUnlocked) {
+              // Navigate to first Fire level
+              window.location.href = '1f.html';
+            } else {
+              this.unlockAndNavigateToNextLevel(track, level);
+            }
+          };
+        }
+
+        // Set up Main Menu button
+        this.mainMenuBtn.onclick = () => {
+          this.hideLevelCompletionOverlay();
+          this.returnToMainMenu();
+        };
+
+        // Show overlay
+        this.levelCompletionOverlay.style.display = 'flex';
+        setTimeout(() => {
+          this.levelCompletionOverlay.classList.add('show');
+        }, 100);
+
+        // Announce to screen readers
+        if (fireTrackUnlocked) {
+          this.announceToScreenReader('Fire track unlocked! Ready to start Fire Level 1. Use Tab to navigate buttons.');
+        } else if (isFinalLevel) {
+          this.announceToScreenReader(`Congratulations! ${track} track completed! ${completedLevels} of ${totalLevels} levels finished.`);
+        } else {
+          this.announceToScreenReader(`Level ${level} completed! ${completedLevels} of ${totalLevels} levels finished. Use Tab to navigate buttons.`);
+        }
+      }
+
+      // Hide level completion overlay
+      hideLevelCompletionOverlay() {
+        this.levelCompletionOverlay.classList.remove('show');
+        setTimeout(() => {
+          this.levelCompletionOverlay.style.display = 'none';
+        }, 500);
+      }
+
+      // Unlock next level and navigate to it
+      unlockAndNavigateToNextLevel(track, currentLevel) {
+        const nextLevel = currentLevel + 1;
+
+        if (nextLevel <= this.levelsCount) {
+          this.setLevelState(track, nextLevel, 'unlocked');
+
+          // Navigate to next level
+          const nextLevelFile = track === 'Earthquake' ? `${nextLevel}e.html` : `${nextLevel}f.html`;
+          window.location.href = nextLevelFile;
+        }
+      }
+
+      // Return to main menu while keeping progress
+      returnToMainMenu() {
+        // Hide any open overlays first
+        this.hideLevelCompletionOverlay();
+
+        // Navigate to main menu (index.html)
+        window.location.href = 'index.html';
+      }
+
+      // Get count of completed levels in a track
+      getCompletedLevelsCount(track) {
+        const levels = this.trackStates[track];
+        if (!levels) return 0;
+
+        if (levels.levels) {
+          // Fire track structure
+          return Object.values(levels.levels).filter(state => state === 'completed').length;
+        } else {
+          // Earthquake track structure
+          return Object.values(levels).filter(state => state === 'completed').length;
+        }
+      }
+
+      // Reset stuck levels (for debugging/fixing issues)
+      resetStuckLevels() {
+        // This function is kept for backward compatibility but no longer needed
+        // as we removed the in_progress state
+        console.log('Reset stuck levels called - no action needed (in_progress removed)');
+      }
+
+      // Announce messages to screen readers
+      announceToScreenReader(message) {
+        this.ariaStatus.textContent = message;
+      }
+
+    }
+
+    // Make functions globally accessible for level files
+    window.markLevelCompleted = function(track, level) {
+      // Get the current track progression instance
+      if (window.trackProgressionInstance) {
+        window.trackProgressionInstance.markLevelCompleted(track, level);
+      }
+    };
+
+    // Global function to reset stuck levels (for debugging)
+    window.resetStuckLevels = function() {
+      if (window.trackProgressionInstance) {
+        window.trackProgressionInstance.resetStuckLevels();
+      }
+    };
+
+    // Initialize the track progression system when DOM is loaded
+    document.addEventListener('DOMContentLoaded', () => {
+      // Start the track progression system and store reference
+      window.trackProgressionInstance = new TrackProgression();
+    });
+  </script>
+
+  <!-- Service Worker Registration for PWA -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then((registration) => {
+            console.log('Service Worker registered with scope:', registration.scope);
+          })
+          .catch((error) => {
+            console.log('Service Worker registration failed:', error);
+          });
+      });
+    }
+  </script>
+
+
+</body>
+</html>

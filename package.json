@@ -1,0 +1,23 @@
+{
+  "name": "survivethedisaster",
+  "version": "1.0.0",
+  "description": "Survive The Disaster - Educational Disaster Preparedness Game",
+  "main": "index.js",
+  "scripts": {
+    "sync": "npx cap sync",
+    "open:android": "npx cap open android",
+    "build:android": "cd android && ./gradlew assembleDebug",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build:automated": "node build-app.js"
+  },
+  "keywords": ["game", "education", "disaster", "pwa"],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@capacitor/android": "^8.1.0",
+    "@capacitor/cli": "^8.1.0",
+    "@capacitor/core": "^8.1.0",
+    "@capacitor/ios": "^8.1.0"
+  }
+}
