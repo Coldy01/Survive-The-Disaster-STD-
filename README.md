@@ -3,3 +3,5 @@ This is a grade 12 quantitative research prototype which originated from "Disast
 
 
 (THIS FILES ARE CREATED FOR THE APP VERSION)
+
+(the use of this app is for educational purposes only)
